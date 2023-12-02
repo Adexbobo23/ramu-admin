@@ -1,0 +1,59 @@
+.email-template {
+    display: flex;
+    align-items: stretch;
+  
+    .email-template__title {
+      color: green;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+  
+    .email-template__sidebar {
+      flex: 0 0 30%;
+      background-color: white;
+  
+      .email-template__template-list {
+        list-style: none;
+        padding: 0;
+  
+        .email-template__template-item {
+          padding: 10px;
+          cursor: pointer;
+  
+          &--active {
+            background-color: green;
+            color: white;
+          }
+        }
+      }
+    }
+  
+    .email-template__editor {
+      flex-grow: 1;
+      background-color: white;
+      padding: 10px;
+  
+      .email-template__textarea {
+        width: 100%;
+        height: 200px;
+        padding: 10px;
+        border: 1px solid green;
+        border-radius: 4px;
+      }
+  
+      .email-template__button {
+        color: white;
+        background-color: green;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+  
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,68 @@
+.user-list-container {
+  padding: 20px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+
+    .search-button {
+      margin-left: 10px;
+      padding-top: 5px;
+      background-color: green;
+    }
+  }
+
+  .user-table {
+    th {
+      font-weight: bold;
+      text-align: left;
+    }
+
+    td {
+      vertical-align: middle;
+    }
+
+    .dropdown {
+      display: inline-block;
+      margin-bottom: 0;
+    }
+
+    .dropdown-toggle {
+      padding: 0.375rem 0.75rem;
+      font-size: 14px;
+      line-height: 1.5;
+      border-radius: 0.25rem;
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+      }
+    }
+
+    .dropdown-menu {
+      font-size: 14px;
+
+      .dropdown-item {
+        padding: 0.25rem 1.5rem;
+        color: #212529;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+          color: #fff;
+          background-color: #007bff;
+        }
+      }
+    }
+  }
+}

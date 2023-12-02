@@ -1,0 +1,22 @@
+.security-settings {
+    .security-settings__title {
+      color: green;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+  
+    .security-settings__option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+  
+      .security-settings__label {
+        margin-right: 10px;
+      }
+  
+      .security-settings__checkbox {
+        margin-right: 5px;
+      }
+    }
+  }
+  

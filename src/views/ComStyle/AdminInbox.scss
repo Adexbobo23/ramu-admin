@@ -1,0 +1,29 @@
+.admin-inbox-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: green;
+    }
+  
+    .inbox-table {
+      th {
+        font-weight: bold;
+      }
+  
+      td {
+        padding: 10px;
+      }
+  
+      tbody tr:nth-child(odd) {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+  

@@ -1,0 +1,15 @@
+.transaction-details {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 5px;
+  
+    &__title {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+  
+    &__item {
+      margin-bottom: 5px;
+    }
+  }
+  

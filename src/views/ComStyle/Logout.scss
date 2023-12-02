@@ -1,0 +1,20 @@
+.logout-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    .btn {
+      background-color: green;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+  
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+  

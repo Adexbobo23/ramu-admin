@@ -1,0 +1,25 @@
+// FinancialReport.scss
+
+$brand-color: green; // Green color
+$background-color: #ffffff; // White color
+
+.financial-report {
+  background-color: $background-color;
+  padding: 20px;
+
+  &__title {
+    color: $brand-color;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  &__chart {
+    margin-bottom: 30px;
+
+    &-title {
+      color: $brand-color;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+  }
+}

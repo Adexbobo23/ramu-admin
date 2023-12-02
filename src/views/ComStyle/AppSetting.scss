@@ -1,0 +1,27 @@
+.app-settings {
+  .app-settings__title {
+    color: green;
+    margin-bottom: 20px;
+  }
+
+  .app-settings__option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .app-settings__label {
+      margin-right: 10px;
+      font-weight: bold;
+    }
+
+    .app-settings__select {
+      padding: 5px;
+      border: 1px solid green;
+      border-radius: 4px;
+    }
+
+    .app-settings__checkbox {
+      margin-left: 10px;
+    }
+  }
+}

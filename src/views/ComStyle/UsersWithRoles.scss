@@ -1,0 +1,39 @@
+.users-with-roles {
+    .users-with-roles__title {
+      color: green;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+  
+    .users-with-roles__list {
+      list-style: none;
+      padding: 0;
+  
+      .users-with-roles__item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+  
+        .users-with-roles__info {
+          flex-grow: 1;
+  
+          .users-with-roles__name {
+            font-weight: bold;
+            margin-right: 10px;
+          }
+  
+          .users-with-roles__role {
+            color: green;
+          }
+        }
+  
+        .users-with-roles__status {
+          color: white;
+          background-color: green;
+          padding: 5px 10px;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
+  
