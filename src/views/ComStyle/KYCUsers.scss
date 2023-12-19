@@ -1,39 +1,112 @@
+// KYCUsers.scss
+
 .kyc-users {
-    .kyc-users__title {
-      color: green;
-      font-size: 24px;
-      margin-bottom: 10px;
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  &__title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
     }
-  
-    .kyc-users__list {
-      list-style: none;
-      padding: 0;
-  
-      .kyc-users__item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-  
-        .kyc-users__info {
-          flex-grow: 1;
-  
-          .kyc-users__name {
-            font-weight: bold;
-            margin-right: 10px;
-          }
-  
-          .kyc-users__email {
-            color: green;
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    &__status {
+      padding: 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+
+      &.approved {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      &.pending {
+        background-color: #ffc107;
+        color: #333;
+      }
+
+      &.denied {
+        background-color: #f44336;
+        color: #fff;
+      }
+    }
+
+    &__actions {
+      display: flex;
+
+      .kyc-users__action {
+        cursor: pointer;
+        padding: 8px;
+        border: none;
+        border-radius: 4px;
+        margin-right: 4px;
+        transition: background-color 0.3s ease;
+
+        &--approve {
+          background-color: #4caf50;
+          color: #fff;
+
+          &:hover {
+            background-color: #45a049;
           }
         }
-  
-        .kyc-users__status {
-          color: white;
-          background-color: green;
-          padding: 5px 10px;
-          border-radius: 4px;
+
+        &--deny {
+          background-color: #f44336;
+          color: #fff;
+
+          &:hover {
+            background-color: #d32f2f;
+          }
+        }
+      }
+    }
+
+    .kyc-users__action {
+      // Styles for individual buttons outside the actions container
+      cursor: pointer;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      margin-right: 4px;
+      transition: background-color 0.3s ease;
+
+      &--approve {
+        background-color: #4caf50;
+        color: #fff;
+
+        &:hover {
+          background-color: #45a049;
+        }
+      }
+
+      &--deny {
+        background-color: #f44336;
+        color: #fff;
+
+        &:hover {
+          background-color: #d32f2f;
         }
       }
     }
   }
-  
+}

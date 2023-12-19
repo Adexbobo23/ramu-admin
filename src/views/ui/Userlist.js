@@ -1,11 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Table, Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Table, Form, FormGroup, Label, Input, Button, Modal, ModalBody } from "reactstrap";
 import axios from "axios";
 import "../ComStyle/UserList.scss";
+
+const UserDetailsModal = ({ user, isOpen, toggle }) => {
+  // Component to display user details in a modal
+  return (
+    <Modal isOpen={isOpen} toggle={toggle}>
+      <ModalBody>
+        <h5>Selected User Details</h5>
+        <br></br>
+        <p>Name: {`${user.first_name} ${user.last_name}`}</p>
+        <p>Username: {user.user_name}</p>
+        <p>Email: {user.email}</p>
+        <p>Phone Number: {user.phone_number}</p>
+        <p>Status: {user.status}</p>
+        {/* Add more details as needed */}
+      </ModalBody>
+    </Modal>
+  );
+};
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isUserDetailsModalOpen, setIsUserDetailsModalOpen] = useState(false);
   // const [actionDropdownOpen, setActionDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -51,17 +71,39 @@ const UserList = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     console.log("Search query:", searchQuery);
-    // Implement your search logic here
+  
+    // Filter users based on the search query
+    const filteredUsers = users.filter((user) => {
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      const userName = user.user_name.toLowerCase();
+      const email = user.email.toLowerCase();
+      const phoneNumber = user.phone_number.toLowerCase();
+      const status = user.status.toLowerCase();
+  
+      // Check if any property matches the search query
+      return (
+        fullName.includes(searchQuery.toLowerCase()) ||
+        userName.includes(searchQuery.toLowerCase()) ||
+        email.includes(searchQuery.toLowerCase()) ||
+        phoneNumber.includes(searchQuery.toLowerCase()) ||
+        status.includes(searchQuery.toLowerCase())
+      );
+    });
+  
+    // Update the state with filtered users
+    setUsers(filteredUsers);
   };
 
-  // const handleActionDropdownToggle = () => {
-  //   setActionDropdownOpen(!actionDropdownOpen);
-  // };
+  const handleUserClick = (user) => {
+    // Set the selected user and open the modal
+    setSelectedUser(user);
+    setIsUserDetailsModalOpen(true);
+  };
 
-  // const handleActionDropdownSelect = (action) => {
-  //   console.log("Selected action:", action);
-  //   // Implement your action logic here
-  // };
+  const toggleUserDetailsModal = () => {
+    // Close the modal
+    setIsUserDetailsModalOpen(!isUserDetailsModalOpen);
+  };
 
   return (
     <div className="user-list-container">
@@ -92,30 +134,28 @@ const UserList = () => {
             <th>Email</th>
             <th>Phone Number</th>
             <th>Status</th>
-            {/* <th>Actions</th> */}
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
+            <tr key={user.id} onClick={() => handleUserClick(user)}>
               <td>{`${user.first_name} ${user.last_name}`}</td>
               <td>{user.user_name}</td>
               <td>{user.email}</td>
               <td>{user.phone_number}</td>
               <td>{user.status}</td>
-              {/* <td>
-                <Dropdown isOpen={actionDropdownOpen} toggle={handleActionDropdownToggle}>
-                  <DropdownToggle caret>Action</DropdownToggle>
-                  <DropdownMenu>
-                    <DropdownItem onClick={() => handleActionDropdownSelect("delete")}>Delete User</DropdownItem>
-                    <DropdownItem onClick={() => handleActionDropdownSelect("reset-password")}>Send Password Reset</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </td> */}
             </tr>
           ))}
         </tbody>
       </Table>
+      {/* Render the UserDetailsModal component when a user is selected */}
+      {selectedUser && (
+        <UserDetailsModal
+          user={selectedUser}
+          isOpen={isUserDetailsModalOpen}
+          toggle={toggleUserDetailsModal}
+        />
+      )}
     </div>
   );
 };

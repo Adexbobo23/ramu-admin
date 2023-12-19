@@ -1,77 +1,96 @@
 import React, { useState, useEffect } from "react";
+import { Table, Form, FormGroup, Label, Input, Button } from "reactstrap";
 import axios from "axios";
 import "../ComStyle/WalletManagement.scss";
 
 const WalletManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [walletBalance, setWalletBalance] = useState(0);
+  const [wallets, setWallets] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    // Fetch users from the backend
-    const fetchUsers = async () => {
+    const fetchWallets = async () => {
       try {
-        const response = await axios.get("/api/users");
-        setUsers(response.data);
+        const adminAuthToken = localStorage.getItem("adminAuthToken");
+        const response = await axios.get(
+          "https://api-staging.ramufinance.com/api/v1/admin/fetch-wallets",
+          {
+            headers: {
+              Authorization: `Bearer ${adminAuthToken}`,
+            },
+          }
+        );
+        setWallets(response.data.data);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching wallets:", error);
       }
     };
 
-    fetchUsers();
+    fetchWallets();
   }, []);
 
-  const handleUserSelect = (user) => {
-    setSelectedUser(user);
-    setWalletBalance(user.walletBalance);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log("Search query:", searchQuery);
+  
+    // Filter wallets based on the search query
+    const filteredWallets = wallets.filter((wallet) => {
+      const emailMatch = wallet.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const walletAddressMatch = wallet.wallet_address.toLowerCase().includes(searchQuery.toLowerCase());
+      const accountReferenceMatch = wallet.account_reference.toLowerCase().includes(searchQuery.toLowerCase());
+      const currencyCodeMatch = wallet.currency_code.toLowerCase().includes(searchQuery.toLowerCase());
+      const balanceMatch = wallet.balance.toLowerCase().includes(searchQuery.toLowerCase());
+  
+      return emailMatch || walletAddressMatch || accountReferenceMatch || currencyCodeMatch || balanceMatch;
+    });
+  
+    // Update the state with filtered wallets
+    setWallets(filteredWallets);
   };
-
-  const handleWalletBalanceUpdate = () => {
-    // Perform update logic for the selected user's wallet balance
-    // ...
-    console.log("Wallet balance updated:", walletBalance);
-  };
+  
 
   return (
     <div className="wallet-management">
-      <h2 className="wallet-management__title">Wallet Management</h2>
-
-      <div className="wallet-management__user-list">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            className={`wallet-management__user ${
-              user === selectedUser ? "selected" : ""
-            }`}
-            onClick={() => handleUserSelect(user)}
-          >
-            {user.name}
+      <h1>Wallet Management</h1>
+      <Form onSubmit={handleSearch}>
+        <FormGroup>
+          <Label for="searchQuery">Search Wallet</Label>
+          <div className="search-form">
+            <Input
+              type="text"
+              name="searchQuery"
+              id="searchQuery"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              required
+            />
+            <Button type="submit" className="search-button">
+              Search
+            </Button>
           </div>
-        ))}
-      </div>
-
-      {selectedUser && (
-        <div className="wallet-management__details">
-          <h3 className="wallet-management__details-title">
-            {selectedUser.name}
-          </h3>
-          <p className="wallet-management__details-balance">
-            Wallet Balance: ${walletBalance}
-          </p>
-          <input
-            type="number"
-            value={walletBalance}
-            onChange={(e) => setWalletBalance(e.target.value)}
-            className="wallet-management__details-input"
-          />
-          <button
-            className="wallet-management__details-button"
-            onClick={handleWalletBalanceUpdate}
-          >
-            Update Wallet Balance
-          </button>
-        </div>
-      )}
+        </FormGroup>
+      </Form>
+      <Table striped className="wallet-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Wallet Address</th>
+            <th>Account Reference</th>
+            <th>Currency Code</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {wallets.map((wallet) => (
+            <tr key={wallet.id}>
+              <td>{wallet.email}</td>
+              <td>{wallet.wallet_address}</td>
+              <td>{wallet.account_reference}</td>
+              <td>{wallet.currency_code}</td>
+              <td>{wallet.balance}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 };

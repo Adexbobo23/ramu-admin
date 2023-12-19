@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import axios from "axios";
@@ -17,13 +17,53 @@ const UserRegistration = () => {
     password_confirmation: "",
   });
 
+  const [roles, setRoles] = useState([]);
+  const [loadingRoles, setLoadingRoles] = useState(true);
+
+  const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        // Retrieve the authentication token from localStorage
+        const adminAuthToken = localStorage.getItem("adminAuthToken");
+
+        // Check if the authentication token is available
+        if (adminAuthToken) {
+          const response = await axios.get(
+            "https://api-staging.ramufinance.com/api/v1/admin/roles",
+            {
+              headers: {
+                Authorization: `Bearer ${adminAuthToken}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            setRoles(response.data.data);
+          } else {
+            console.error("Error fetching roles:", response.statusText);
+          }
+        } else {
+          console.error("Authentication token is missing.");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching roles:", error);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       // Retrieve the authentication token from localStorage
       const adminAuthToken = localStorage.getItem("adminAuthToken");
-
+  
       // Check if the authentication token is available
       if (adminAuthToken) {
         const response = await axios.post(
@@ -36,11 +76,11 @@ const UserRegistration = () => {
             },
           }
         );
-
+  
         if (response.status === 201) {
           // User creation successful
           console.log("User created successfully:", response.data);
-
+  
           // Reset form after submission
           setFormData({
             user_name: "",
@@ -52,15 +92,20 @@ const UserRegistration = () => {
             password: "",
             password_confirmation: "",
           });
-
+  
           // Navigate to a different page after successful form submission
           navigate("/dashboard");
+  
+          // Display a success message
+          alert("User created successfully!");
         } else {
           console.error("Error creating user:", response.statusText);
+          alert("User creation failed. Please check the form data.");
         }
       } else {
         // Handle case where authentication token is not available
         console.error("Authentication token is missing.");
+        alert("User creation failed. Authentication token is missing.");
       }
     } catch (error) {
       if (error.response) {
@@ -68,16 +113,35 @@ const UserRegistration = () => {
         // that falls out of the range of 2xx
         console.error("Server responded with error status:", error.response.status);
         console.error("Response data:", error.response.data);
-        console.error("Response headers:", error.response.headers);
+  
+        // Display validation errors to the user
+        if (error.response.data.message) {
+          if (typeof error.response.data.message === "string") {
+            alert(`User creation failed. ${error.response.data.message}`);
+          } else if (typeof error.response.data.message === "object") {
+            const errorMessages = Object.values(error.response.data.message)
+              .flat()
+              .join(", ");
+            alert(`User creation failed. ${errorMessages}`);
+          } else {
+            alert("User creation failed. Please check the form data.");
+          }
+        } else {
+          alert("User creation failed. Please check the form data.");
+        }
       } else if (error.request) {
         // The request was made but no response was received
         console.error("No response received. Request details:", error.request);
+        alert("User creation failed. No response received from the server.");
       } else {
         // Something happened in setting up the request that triggered an Error
         console.error("Error setting up the request:", error.message);
+        alert("User creation failed. Error setting up the request.");
       }
     }
   };
+  
+  
 
   const handleChange = (e) => {
     setFormData({
@@ -147,6 +211,27 @@ const UserRegistration = () => {
             />
           </FormGroup>
           <FormGroup>
+            <Label for="role_id">Role</Label>
+            <Input
+              type="select"
+              name="role_id"
+              id="role_id"
+              value={formData.role_id}
+              onChange={handleChange}
+              required
+            >
+              {loadingRoles ? (
+                <option value="" disabled>Loading roles...</option>
+              ) : (
+                roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.display_name}
+                  </option>
+                ))
+              )}
+            </Input>
+          </FormGroup>
+          <FormGroup>
             <Label for="password">Password</Label>
             <Input
               type="password"
@@ -169,6 +254,13 @@ const UserRegistration = () => {
             />
           </FormGroup>
           <Button type="submit">Add User</Button>
+
+          {/* Alert for successful registration */}
+          {isRegistrationSuccess && (
+            <div className="alert alert-success mt-3" role="alert">
+              User created successfully!
+            </div>
+          )}
         </Form>
       </div>
     </div>

@@ -32,6 +32,7 @@ import WalletManagement from "../views/ui/WalletManagement.js";
 import AdminLogin from "../views/ui/AdminLogin.js";
 import EditRole from "../views/ui/EditRoles.js";
 import CreateRole from "../views/ui/CreateRole.js";
+import MarketMarkup from "../views/ui/MarketMarkup.js";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
@@ -90,6 +91,7 @@ const ThemeRoutes = [
       { path: "/login", exact: true, element: <AdminLogin /> },
       { path: "/edit-role", exact: true, element: <EditRole /> },
       { path: "/create-role", exact: true, element: <CreateRole /> },
+      { path: "/market-markup", exact: true, element: <MarketMarkup/> },
     ],
   },
 ];

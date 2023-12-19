@@ -16,6 +16,7 @@ import {
 // import Logo from "./Logo";
 import { ReactComponent as LogoWhite } from "../assets/images/logos/black_logo.svg";
 import user1 from "../assets/images/users/user4.jpg";
+import white_logo from "../assets/images/white_logo.png"
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,8 @@ const Header = () => {
         <div className="d-lg-block d-none me-5 pe-3">
           {/* <Logo /> */}
           <Link to="/dashboard" className="nav-link">
-            <h5><b>RAMU FINANCE</b></h5>
+            <img src={white_logo} alt="Ramu Finance Logo" style={{ width: '150px', height: '50px' }} />
+            {/* <h5><b>RAMU FINANCE</b></h5> */}
           </Link>
         </div>
         <NavbarBrand href="/">
@@ -68,17 +70,17 @@ const Header = () => {
         <Nav className="me-auto" navbar>
           <NavItem>
             <Link to="/dashboard" className="nav-link">
-              Dashboard
+            <span className="ms-3 d-inline-block text-white">Dashboard</span>
             </Link>
           </NavItem>
           <NavItem>
             <Link to="/stocks-listing" className="nav-link">
-              Stock Listings
+            <span className="ms-3 d-inline-block text-white">Stock Listings</span>
             </Link>
           </NavItem>
           <UncontrolledDropdown inNavbar nav>
             <DropdownToggle caret nav>
-              Manage Users
+            <span className="ms-3 d-inline-block text-white">Manage Users</span>
             </DropdownToggle>
             <DropdownMenu end>
               <Link to="user-list" className="nav-link">
@@ -89,8 +91,8 @@ const Header = () => {
                 <DropdownItem>Add User</DropdownItem>
               </Link>
               <DropdownItem divider />
-              <Link to="role-management" className="nav-link">
-                <DropdownItem>Role Management</DropdownItem>
+              <Link to="/stocks-listing" className="nav-link">
+                <DropdownItem>Stock Management</DropdownItem>
               </Link> 
             </DropdownMenu>
           </UncontrolledDropdown>
@@ -118,9 +120,9 @@ const Header = () => {
             <DropdownItem>Edit Role</DropdownItem>
             </Link> */}
 
-            <Link to="/inbox" className="nav-link">
+            {/* <Link to="/inbox" className="nav-link">
             <DropdownItem>Inbox</DropdownItem>
-            </Link>
+            </Link> */}
 
             <Link to="/logout" className="nav-link">
             <DropdownItem>Logout</DropdownItem>

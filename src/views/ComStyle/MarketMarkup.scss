@@ -1,0 +1,41 @@
+.market-markup {
+    padding: 20px;
+  
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+  
+    .market-markup__table {
+      width: 100%;
+      border-collapse: collapse;
+  
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+  
+      th {
+        background-color: #f2f2f2;
+      }
+  
+      td {
+        font-size: 14px;
+      }
+      .edit-btn {
+        background-color: #51CC62; 
+        color: #fff;
+        padding: 8px 16px; 
+        border: none;
+        border-radius: 4px; 
+        cursor: pointer;
+      
+        /* Additional styles on hover */
+        &:hover {
+          background-color: #079b1b;
+        }
+      }
+    }
+  }
+  

@@ -31,8 +31,8 @@ const AdminLogin = ({ onAuthentication }) => {
           // Store the authentication token in localStorage
           localStorage.setItem('adminAuthToken', authToken);
   
+          setShowModal(true); // Set showModal to true before calling onAuthentication
           onAuthentication();
-          setShowModal(true);
         } else {
           setError('Authentication token is missing in the response.');
         }
@@ -43,6 +43,7 @@ const AdminLogin = ({ onAuthentication }) => {
       setError('An error occurred. Please try again later.');
     }
   };
+  
   
   
 

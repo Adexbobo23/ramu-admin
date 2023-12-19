@@ -1,53 +1,22 @@
-import { Nav, NavItem } from "reactstrap";
+import React, { useState } from "react";
+import { Nav, NavItem, Collapse } from "reactstrap";
 import { Link, useLocation } from "react-router-dom";
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import { Nav, NavItem, Dropdown } from 'react-bootstrap';
 
-// const navigation = [
-//   {
-//     title: "Dashboard",
-//     href: "/dashboard",
-//     icon: "bi bi-speedometer2",
-//   },
-//   {
-//     title: "Notifications",
-//     href: "/notifications",
-//     icon: "bi bi-bell",
-//   },
-//   {
-//     title: "Stock Listings",
-//     href: "/stocks-listing",
-//     icon: "bi bi-patch-check",
-//   },
-//   {
-//     title: "Transactions",
-//     href: "/transactions",
-//     icon: "bi bi-hdd-stack",
-//   },
-//   {
-//     title: "System",
-//     href: "/systems-configuration",
-//     icon: "bi bi-card-text",
-//   },
-//   {
-//     title: "Role Management",
-//     href: "/role-management",
-//     icon: "bi bi-columns",
-//   },
-//   {
-//     title: "Reporting",
-//     href: "/report-analysis",
-//     icon: "bi bi-layout-split",
-//   },
-//   {
-//     title: "User Management",
-//     href: "/user-management",
-//     icon: "bi bi-people",
-//   },
-// ];
 
 const Sidebar = () => {
   let location = useLocation();
+  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  const [stockDropdownOpen, setStockDropdownOpen] = useState(false);
+
+  // Function to toggle the Role Management dropdown
+  const toggleRoleDropdown = () => {
+    setRoleDropdownOpen(!roleDropdownOpen);
+  };
+
+  const toggleStockDropdown = () => {
+    setStockDropdownOpen(!stockDropdownOpen);
+  };
+
 
   return (
     <div className="bg-dark">
@@ -137,33 +106,6 @@ const Sidebar = () => {
 
           <NavItem className="sidenav-bg">
             <Link
-              to="/create-role"
-              className={
-                location.pathname === "/create-role"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-person-plus"></i>
-              <span className="ms-3 d-inline-block">Create Role</span>
-            </Link>
-          </NavItem>
-          
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/role"
-              className={
-                location.pathname === "/role-list"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-columns"></i>
-              <span className="ms-3 d-inline-block">Role List</span>
-            </Link>
-          </NavItem>
-          <NavItem className="sidenav-bg">
-            <Link
               to="/wallets"
               className={
                 location.pathname === "/wallets"
@@ -175,73 +117,117 @@ const Sidebar = () => {
               <span className="ms-3 d-inline-block">Wallet Management</span>
             </Link>
           </NavItem>
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/role-details"
-              className={
-                location.pathname === "/user-details"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-person"></i>
-              <span className="ms-3 d-inline-block">All Roles</span>
-            </Link>
-          </NavItem>
 
           <NavItem className="sidenav-bg">
-            <Link
-              to="/edit-role"
+              <Link
+              to="#"
+              onClick={toggleRoleDropdown}
               className={
-                location.pathname === "/edit-role"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-pencil"></i>
-              <span className="ms-3 d-inline-block">Edit Role</span>
-            </Link>
-          </NavItem>
-          
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/role-management"
-              className={
-                location.pathname === "/create-role"
+                location.pathname === "/create-role" ||
+                location.pathname === "/edit-role" ||
+                location.pathname === "/user-details" ||
+                location.pathname === "/role-list"
                   ? "active nav-link py-3"
                   : "nav-link py-3"
               }
             >
               <i className="bi bi-file-earmark-plus"></i>
-              <span className="ms-3 d-inline-block">Role Management</span>
+            <span className="ms-3 d-inline-block">Role Management</span>
+            <i
+              className={`bi ${
+                roleDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+              } ms-2 ms-auto`}
+            ></i>
             </Link>
+
+            {/* Collapse component for the Role Management dropdown */}
+            <Collapse isOpen={roleDropdownOpen}>
+              <Nav vertical className="pl-4">
+                <NavItem>
+                  <Link
+                    to="/create-role"
+                    className={
+                      location.pathname === "/create-role"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Create Role</span>
+                  </Link>
+                </NavItem>
+                
+                <NavItem>
+                  <Link
+                    to="/role-details"
+                    className={
+                      location.pathname === "/user-details"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">All Roles</span>
+                  </Link>
+                </NavItem>
+              
+              </Nav>
+            </Collapse>
           </NavItem>
-          <NavItem className="sidenav-bg">
+
+           {/* Stock Management Dropdown */}
+           <NavItem className="sidenav-bg">
             <Link
-              to="/stocks-listing"
+              to="#"
+              onClick={toggleStockDropdown}
               className={
-                location.pathname === "/stock-list"
+                location.pathname === "/edit-stock" ||
+                location.pathname === "/add-stock" ||
+                location.pathname === "/market-markup" ||
+                location.pathname === "/edit-market-markup"
                   ? "active nav-link py-3"
                   : "nav-link py-3"
               }
             >
-              <i className="bi bi-patch-check"></i>
-              <span className="ms-3 d-inline-block">Stock List</span>
+              <i className="bi bi-box"></i>
+              <span className="ms-3 d-inline-block">Stock Management</span>
+              <i
+                className={`bi ${
+                  stockDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+                } ms-2 ms-auto`}
+              ></i>
             </Link>
+
+            {/* Collapse component for the Stock Management dropdown */}
+            <Collapse isOpen={stockDropdownOpen}>
+              <Nav vertical className="pl-4">
+              <NavItem className="sidenav-bg">
+                <Link
+                  to="/stocks-listing"
+                  className={
+                    location.pathname === "/stock-list"
+                      ? "active nav-link py-3"
+                      : "nav-link py-3"
+                  }
+                >
+                  {/* <i className="bi bi-patch-check"></i> */}
+                  <span className="ms-3 d-inline-block">Stock List</span>
+                </Link>
+              </NavItem>
+              
+                <NavItem>
+                  <Link
+                    to="/market-markup"
+                    className={
+                      location.pathname === "/market-markup"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Market Markup</span>
+                  </Link>
+                </NavItem>
+              </Nav>
+            </Collapse>
           </NavItem>
-          {/* <NavItem className="sidenav-bg">
-            <Link
-              to="/transactions"
-              className={
-                location.pathname === "/transaction-list"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-hdd-stack"></i>
-              <span className="ms-3 d-inline-block">Transaction List</span>
-            </Link>
-          </NavItem> */}
           <NavItem className="sidenav-bg">
             <Link
               to="/transaction-details"
@@ -255,100 +241,7 @@ const Sidebar = () => {
               <span className="ms-3 d-inline-block">Transaction Details</span>
             </Link>
           </NavItem>
-          {/* <NavItem className="sidenav-bg">
-            <Link
-              to="/app-settings"
-              className={
-                location.pathname === "/app-settings"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-gear"></i>
-              <span className="ms-3 d-inline-block">App Settings</span>
-            </Link>
-          </NavItem> */}
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/email-templates"
-              className={
-                location.pathname === "/email-templates"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-envelope"></i>
-              <span className="ms-3 d-inline-block">Email Templates</span>
-            </Link>
-          </NavItem>
-          
-          {/* <NavItem className="sidenav-bg">
-            <Link
-              to="/security-settings"
-              className={
-                location.pathname === "/security-settings"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-shield-lock"></i>
-              <span className="ms-3 d-inline-block">Security Settings</span>
-            </Link>
-          </NavItem> */}
-          
-    
-          {/* <NavItem className="sidenav-bg">
-            <Link
-              to="/financial-reports"
-              className={
-                location.pathname === "/financial-reports"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-file-earmark-bar-graph"></i>
-              <span className="ms-3 d-inline-block">Financial Reports</span>
-            </Link>
-          </NavItem> */}
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/user-activity"
-              className={
-                location.pathname === "/user-activity"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-journal-check"></i>
-              <span className="ms-3 d-inline-block">User Activity Monitoring</span>
-            </Link>
-          </NavItem>
-          {/* <NavItem className="sidenav-bg">
-            <Link
-              to="/notifications"
-              className={
-                location.pathname === "/system-notifications"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-bell"></i>
-              <span className="ms-3 d-inline-block">System Notifications</span>
-            </Link>
-          </NavItem> */}
-          {/* <NavItem className="sidenav-bg">
-            <Link
-              to="/security-alerts"
-              className={
-                location.pathname === "/security-alerts"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-exclamation-circle"></i>
-              <span className="ms-3 d-inline-block">Security Alerts</span>
-            </Link>
-          </NavItem> */}
+      
         </Nav>
       </div>
     </div>

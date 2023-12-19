@@ -1,63 +1,35 @@
 // WalletManagement.scss
-
-$brand-color: green; // Green color
-$background-color: #ffffff; // White color
-
 .wallet-management {
-  background-color: $background-color;
   padding: 20px;
 
-  &__title {
-    color: $brand-color;
+  h1 {
     font-size: 24px;
+    font-weight: bold;
     margin-bottom: 20px;
   }
 
-  &__user-list {
+  .search-form {
     display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
+    align-items: center;
 
-    &-user {
-      padding: 10px;
-      cursor: pointer;
-
-      &.selected {
-        background-color: $brand-color;
-        color: $background-color;
-      }
+    .search-button {
+      margin-left: 10px;
+      padding-top: 5px;
+      background-color: green;
     }
   }
 
-  &__details {
-    border: 1px solid $brand-color;
-    padding: 20px;
-
-    &-title {
-      color: $brand-color;
-      font-size: 18px;
-      margin-bottom: 10px;
+  .wallet-table {
+    th {
+      font-weight: bold;
+      text-align: left;
     }
 
-    &-balance {
-      margin-bottom: 10px;
-    }
-
-    &-input {
-      padding: 5px;
-      margin-bottom: 10px;
-    }
-
-    &-button {
-      background-color: $brand-color;
-      color: $background-color;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-
-      &:hover {
-        background-color: darken($brand-color, 10%);
-      }
+    td {
+      vertical-align: middle;
+      border: 1px solid #ddd;
+      padding: 12px;
+      font-size: 14px;
     }
   }
 }

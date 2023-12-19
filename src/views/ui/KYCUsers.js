@@ -1,37 +1,65 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import "../ComStyle/KYCUsers.scss";
 
 const KYCUsers = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([
+    { id: 1, name: "John Doe", email: "john@example.com", status: "Pending" },
+    { id: 2, name: "Jane Doe", email: "jane@example.com", status: "Approved" },
+    { id: 3, name: "Bob Smith", email: "bob@example.com", status: "Pending" },
+    // Add more sample data as needed
+  ]);
 
-  useEffect(() => {
-    const fetchKYCUsers = async () => {
-      try {
-        const response = await axios.get("/api/kycusers");
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching KYC users:", error);
-      }
-    };
+  const handleAction = (userId, action) => {
+    // Update the status based on the admin's action
+    const updatedUsers = users.map((user) =>
+      user.id === userId ? { ...user, status: action } : user
+    );
 
-    fetchKYCUsers();
-  }, []);
+    setUsers(updatedUsers);
+  };
 
   return (
     <div className="kyc-users">
       <h2 className="kyc-users__title">KYC Users</h2>
-      <ul className="kyc-users__list">
-        {users.map((user) => (
-          <li key={user.id} className="kyc-users__item">
-            <div className="kyc-users__info">
-              <span className="kyc-users__name">{user.name}</span>
-              <span className="kyc-users__email">{user.email}</span>
-            </div>
-            <span className="kyc-users__status">KYC Completed</span>
-          </li>
-        ))}
-      </ul>
+      <table className="kyc-users__table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td className={`kyc-users__status ${user.status.toLowerCase()}`}>
+                {user.status}
+              </td>
+              <td>
+                {user.status === "Pending" && (
+                  <div className="kyc-users__actions">
+                    <button
+                      onClick={() => handleAction(user.id, "Approved")}
+                      className="kyc-users__action kyc-users__action--approve"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleAction(user.id, "Denied")}
+                      className="kyc-users__action kyc-users__action--deny"
+                    >
+                      Deny
+                    </button>
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
