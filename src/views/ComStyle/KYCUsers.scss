@@ -99,6 +99,15 @@
         }
       }
 
+      &--view-details {
+        background-color: #4caf50;
+        color: #fff;
+
+        &:hover {
+          background-color: #45a049;
+        }
+      }
+
       &--deny {
         background-color: #f44336;
         color: #fff;

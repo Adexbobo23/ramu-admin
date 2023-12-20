@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button, Modal, ModalBody } from "reactstrap";
 import "../ComStyle/KYCUsers.scss";
 
 const KYCUsers = () => {
@@ -9,6 +10,9 @@ const KYCUsers = () => {
     // Add more sample data as needed
   ]);
 
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isKYCDetailsModalOpen, setIsKYCDetailsModalOpen] = useState(false);
+
   const handleAction = (userId, action) => {
     // Update the status based on the admin's action
     const updatedUsers = users.map((user) =>
@@ -16,6 +20,17 @@ const KYCUsers = () => {
     );
 
     setUsers(updatedUsers);
+  };
+
+  const handleViewDetails = (user) => {
+    // Set the selected user and open the KYC details modal
+    setSelectedUser(user);
+    setIsKYCDetailsModalOpen(true);
+  };
+
+  const toggleKYCDetailsModal = () => {
+    // Close the KYC details modal
+    setIsKYCDetailsModalOpen(!isKYCDetailsModalOpen);
   };
 
   return (
@@ -42,6 +57,12 @@ const KYCUsers = () => {
                 {user.status === "Pending" && (
                   <div className="kyc-users__actions">
                     <button
+                      onClick={() => handleViewDetails(user)}
+                      className="kyc-users__action kyc-users__action--view-details"
+                    >
+                      View Details
+                    </button>
+                    <button
                       onClick={() => handleAction(user.id, "Approved")}
                       className="kyc-users__action kyc-users__action--approve"
                     >
@@ -60,6 +81,27 @@ const KYCUsers = () => {
           ))}
         </tbody>
       </table>
+
+      {/* KYC Details Modal */}
+      {selectedUser && (
+        <Modal isOpen={isKYCDetailsModalOpen} toggle={toggleKYCDetailsModal}>
+          <ModalBody>
+            <h5>KYC Details for {selectedUser.name}</h5>
+            <br />
+            <p>Email: {selectedUser.email}</p>
+            <p>Status: {selectedUser.status}</p>
+            {/* Add more KYC details as needed */}
+            <div className="kyc-modal__actions">
+              <Button color="success" onClick={() => handleAction(selectedUser.id, "Approved")}>
+                Approve
+              </Button>{" "}
+              <Button color="danger" onClick={() => handleAction(selectedUser.id, "Denied")}>
+                Deny
+              </Button>{" "}
+            </div>
+          </ModalBody>
+        </Modal>
+      )}
     </div>
   );
 };

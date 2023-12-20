@@ -7,6 +7,9 @@ const Sidebar = () => {
   let location = useLocation();
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [stockDropdownOpen, setStockDropdownOpen] = useState(false);
+  const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
+  const [blogDropdownOpen, setBlogDropdownOpen] = useState(false);
+  const [emailTemplateDropdownOpen, setEmailTemplateDropdownOpen] = useState(false);
 
   // Function to toggle the Role Management dropdown
   const toggleRoleDropdown = () => {
@@ -17,37 +20,20 @@ const Sidebar = () => {
     setStockDropdownOpen(!stockDropdownOpen);
   };
 
+  const toggleHelpDropdown = () => {
+    setHelpDropdownOpen(!helpDropdownOpen);
+  };
+
+  const toggleBlogDropdown = () => {
+    setBlogDropdownOpen(!blogDropdownOpen);
+  };
+
+  const toggleEmailTemplateDropdown = () => {
+    setEmailTemplateDropdownOpen(!emailTemplateDropdownOpen);
+  };
 
   return (
     <div className="bg-dark">
-      {/* <div className="d-flex">
-        <Button
-          color="white"
-          className="ms-auto text-white d-lg-none"
-          onClick={() => showMobilemenu()}
-        >
-          <i className="bi bi-x"></i>
-        </Button>
-      </div>
-      <div className="p-3 mt-2">
-        <Nav vertical className="sidebarNav">
-          {navigation.map((navi, index) => (
-            <NavItem key={index} className="sidenav-bg">
-              <Link
-                to={navi.href}
-                className={
-                  location.pathname === navi.href
-                    ? "active nav-link py-3"
-                    : "nav-link py-3"
-                }
-              >
-                <i className={navi.icon}></i>
-                <span className="ms-3 d-inline-block">{navi.title}</span>
-              </Link>
-            </NavItem>
-          ))}
-        </Nav>
-      </div> */}
       <div className="mt-auto">
         <Nav vertical className="sidebarNav">
           <NavItem className="sidenav-bg">
@@ -104,6 +90,109 @@ const Sidebar = () => {
             </Link>
           </NavItem>
 
+          {/* Blog Management Dropdown */}
+          <NavItem className="sidenav-bg">
+            <Link
+              to="#"
+              onClick={toggleBlogDropdown}
+              className={
+                location.pathname === "/all-blogs" ||
+                location.pathname === "/create-blog"
+                  ? "active nav-link py-3"
+                  : "nav-link py-3"
+              }
+            >
+              <i className="bi bi-pencil"></i>
+              <span className="ms-3 d-inline-block">Blog Management</span>
+              <i
+                className={`bi ${
+                  blogDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+                } ms-2 ms-auto`}
+              ></i>
+            </Link>
+
+            {/* Collapse component for the Blog Management dropdown */}
+            <Collapse isOpen={blogDropdownOpen}>
+              <Nav vertical className="pl-4">
+                <NavItem>
+                  <Link
+                    to="/all-blogs"
+                    className={
+                      location.pathname === "/all-blogs"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">All Blogs</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link
+                    to="/create-blog"
+                    className={
+                      location.pathname === "/create-blog"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Create Blog</span>
+                  </Link>
+                </NavItem>
+              </Nav>
+            </Collapse>
+          </NavItem>
+           {/* Email Template Dropdown */}
+           <NavItem className="sidenav-bg">
+            <Link
+              to="#"
+              onClick={toggleEmailTemplateDropdown}
+              className={
+                location.pathname === "/get-all-email-templates" ||
+                location.pathname === "/create-email-template"
+                  ? "active nav-link py-3"
+                  : "nav-link py-3"
+              }
+            >
+              <i className="bi bi-envelope"></i>
+              <span className="ms-3 d-inline-block">Email Template</span>
+              <i
+                className={`bi ${
+                  emailTemplateDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+                } ms-2 ms-auto`}
+              ></i>
+            </Link>
+
+            {/* Collapse component for the Email Template dropdown */}
+            <Collapse isOpen={emailTemplateDropdownOpen}>
+              <Nav vertical className="pl-4">
+                <NavItem>
+                  <Link
+                    to="/get-all-email-templates"
+                    className={
+                      location.pathname === "/get-all-email-templates"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Get All Email Templates</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link
+                    to="/create-email-template"
+                    className={
+                      location.pathname === "/create-email-template"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Create Email Template</span>
+                  </Link>
+                </NavItem>
+              </Nav>
+            </Collapse>
+          </NavItem>
+          
           <NavItem className="sidenav-bg">
             <Link
               to="/wallets"
@@ -228,6 +317,55 @@ const Sidebar = () => {
               </Nav>
             </Collapse>
           </NavItem>
+          {/* Help and Support Dropdown */}
+          <NavItem className="sidenav-bg">
+            <Link
+              to="#"
+              onClick={toggleHelpDropdown}
+              className={
+                helpDropdownOpen ? "active nav-link py-3" : "nav-link py-3"
+              }
+            >
+              <i className="bi bi-question-circle"></i>
+              <span className="ms-3 d-inline-block">Help and Support</span>
+              <i
+                className={`bi ${
+                  helpDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+                } ms-2 ms-auto`}
+              ></i>
+            </Link>
+
+            {/* Collapse component for the Help and Support dropdown */}
+            <Collapse isOpen={helpDropdownOpen}>
+              <Nav vertical className="pl-4">
+                <NavItem>
+                  <Link
+                    to="/contact"
+                    className={
+                      location.pathname === "/contact"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Contact</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link
+                    to="/report-scam"
+                    className={
+                      location.pathname === "/report-scam"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Report Scam</span>
+                  </Link>
+                </NavItem>
+              </Nav>
+            </Collapse>
+          </NavItem>
+
           <NavItem className="sidenav-bg">
             <Link
               to="/transaction-details"
@@ -241,7 +379,6 @@ const Sidebar = () => {
               <span className="ms-3 d-inline-block">Transaction Details</span>
             </Link>
           </NavItem>
-      
         </Nav>
       </div>
     </div>

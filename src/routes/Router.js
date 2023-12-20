@@ -33,6 +33,12 @@ import AdminLogin from "../views/ui/AdminLogin.js";
 import EditRole from "../views/ui/EditRoles.js";
 import CreateRole from "../views/ui/CreateRole.js";
 import MarketMarkup from "../views/ui/MarketMarkup.js";
+import AllBlog from "../views/ui/AllBlog.js";
+import CreateBlog from "../views/ui/CreateBlog.js";
+import GetAllEmailTemplates from "../views/ui/GetAllEmailTemplates.js";
+import CreateEmailTemplate from "../views/ui/CreateEmailTemplate.js";
+import ContactFormData from "../views/ui/ContactFormData.js";
+import ReportSpamData from "../views/ui/ReportSpamData.js";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
@@ -92,6 +98,12 @@ const ThemeRoutes = [
       { path: "/edit-role", exact: true, element: <EditRole /> },
       { path: "/create-role", exact: true, element: <CreateRole /> },
       { path: "/market-markup", exact: true, element: <MarketMarkup/> },
+      { path: "/all-blogs", exact: true, element: <AllBlog/> },
+      { path: "/create-blog", exact: true, element: <CreateBlog/> },
+      { path: "/get-all-email-templates", exact: true, element: <GetAllEmailTemplates/> },
+      { path: "/create-email-template", exact: true, element: <CreateEmailTemplate /> },
+      { path: "/contact", exact: true, element: <ContactFormData/> },
+      { path: "/report-scam", exact: true, element: <ReportSpamData /> },
     ],
   },
 ];

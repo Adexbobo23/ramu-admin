@@ -1,3 +1,8 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+
 .user-list-container {
   padding: 20px;
 
@@ -26,6 +31,26 @@
 
     td {
       vertical-align: middle;
+    }
+
+    .action-buttons {
+      display: flex;
+      button {
+        margin-right: 5px; // Add some spacing between buttons
+        font-size: $font-size-base; // Use Bootstrap's base font size
+    
+        // Customize the "Suspend" button
+        &.suspend-btn {
+          background-color: #ffc107; // Bootstrap's warning color
+          border-color: #ffc107;
+        }
+    
+        // Customize the "Delete" button
+        &.delete-btn {
+          background-color: #dc3545; // Bootstrap's danger color
+          border-color: #dc3545;
+        }
+      }
     }
 
     .dropdown {
