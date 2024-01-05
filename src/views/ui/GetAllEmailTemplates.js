@@ -1,26 +1,11 @@
-// GetAllEmailTemplates.js
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit } from "react-icons/fi";
-import { Modal, ModalBody, Button, Form, FormGroup, Label, Input } from "reactstrap"; // Assuming you're using Bootstrap for the modal
+import { Modal, ModalBody, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import axios from "axios";
 import "../ComStyle/GetAllEmailTemplates.scss";
 
-const demoEmailTemplates = [
-  {
-    id: 1,
-    name: "Welcome Email",
-    subject: "Welcome to Our Platform!",
-    content: "Dear user, welcome to our platform. Enjoy your experience!",
-  },
-  {
-    id: 2,
-    name: "Promotional Email",
-    subject: "Special Offer Inside!",
-    content: "Don't miss our exclusive promotional offer. Limited time only!",
-  },
-];
-
 const GetAllEmailTemplates = () => {
+  const [emailTemplates, setEmailTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editedTemplate, setEditedTemplate] = useState({
@@ -28,6 +13,35 @@ const GetAllEmailTemplates = () => {
     subject: "",
     content: "",
   });
+
+  useEffect(() => {
+    // Fetch email templates from the API when the component mounts
+    fetchEmailTemplates();
+  }, []);
+
+  const fetchEmailTemplates = async () => {
+    try {
+      // Retrieve the admin authentication token from localStorage
+      const adminAuthToken = localStorage.getItem("adminAuthToken");
+
+      if (!adminAuthToken) {
+        throw new Error("Admin authentication token not available");
+      }
+
+      // Fetch email templates using the admin token for authentication
+      const response = await axios.get("https://api-staging.ramufinance.com/api/v1/admin/email-templates", {
+        headers: {
+          Authorization: `Bearer ${adminAuthToken}`,
+        },
+      });
+
+      // Update the state with the fetched email templates
+      setEmailTemplates(response.data.data);
+    } catch (error) {
+      console.error("Error fetching email templates:", error);
+      // Handle error, e.g., show an error message
+    }
+  };
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -43,12 +57,35 @@ const GetAllEmailTemplates = () => {
     toggleModal();
   };
 
-  const handleSave = () => {
-    // Handle saving the updated template
-    console.log("Updated template:", editedTemplate);
+  const handleSave = async () => {
+    try {
+      // Retrieve the admin authentication token from localStorage
+      const adminAuthToken = localStorage.getItem("adminAuthToken");
 
-    // Close the modal after saving
-    toggleModal();
+      if (!adminAuthToken) {
+        throw new Error("Admin authentication token not available");
+      }
+
+      // Update the email template using the admin token for authentication
+      await axios.put(
+        `https://api-staging.ramufinance.com/api/v1/admin/edit-email-template/${selectedTemplate.id}`,
+        editedTemplate,
+        {
+          headers: {
+            Authorization: `Bearer ${adminAuthToken}`,
+          },
+        }
+      );
+
+      // Refresh the email templates list after updating
+      await fetchEmailTemplates();
+
+      // Close the modal after saving
+      toggleModal();
+    } catch (error) {
+      console.error("Error updating email template:", error);
+      // Handle error, e.g., show an error message
+    }
   };
 
   const handleInputChange = (e) => {
@@ -63,7 +100,7 @@ const GetAllEmailTemplates = () => {
     <div className="get-all-email-templates-container">
       <h1>All Email Templates</h1>
       <div className="email-templates-list">
-        {demoEmailTemplates.map((template) => (
+        {emailTemplates.map((template) => (
           <div key={template.id} className="email-template-item">
             <h2>{template.name}</h2>
             <p>{template.subject}</p>
@@ -110,7 +147,7 @@ const GetAllEmailTemplates = () => {
                 onChange={handleInputChange}
               />
             </FormGroup>
-            <Button style={{ backgroundColor: '#51CC62' }} onClick={handleSave}>
+            <Button style={{ backgroundColor: "#51CC62" }} onClick={handleSave}>
               Save
             </Button>
           </Form>

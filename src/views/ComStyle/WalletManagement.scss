@@ -30,6 +30,19 @@
       border: 1px solid #ddd;
       padding: 12px;
       font-size: 14px;
+
+      button {
+        background-color: #51cc62; // Your brand color
+        color: #fff; // Text color
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #408d4d; // Hover color
+        }
+      }
     }
   }
   // Pagination.scss

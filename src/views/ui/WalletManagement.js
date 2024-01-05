@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Table, Form, FormGroup, Label, Input, Button, Modal, ModalBody } from "reactstrap";
 import axios from "axios";
 import "../ComStyle/WalletManagement.scss";
 
@@ -10,6 +10,11 @@ const WalletManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+
 
   const fetchWallets = async () => {
     try {
@@ -85,6 +90,35 @@ const WalletManagement = () => {
     setCurrentPage(pageNumber);
   };
 
+  const fetchTransactions = async (walletId) => {
+    try {
+      const adminAuthToken = localStorage.getItem("adminAuthToken");
+      const response = await axios.get(
+        `https://api-staging.ramufinance.com/api/v1/admin/fetch-transactions?walletId=${walletId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminAuthToken}`,
+          },
+        }
+      );
+
+      const data = response.data.data;
+      setTransactions(data);
+      toggleModal();
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+  const handleWalletClick = (wallet) => {
+    setSelectedWallet(wallet);
+    fetchTransactions(wallet.id);
+  };
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   // Calculate the total number of pages based on the number of items and itemsPerPage
   const totalPages = Math.ceil(filteredWallets.length / itemsPerPage);
 
@@ -122,7 +156,6 @@ const WalletManagement = () => {
             <option value="">All Currencies</option>
             <option value="USD">Dollar</option>
             <option value="NGN">Naira</option>
-            {/* Add more currency options as needed */}
           </Input>
         </FormGroup>
       </Form>
@@ -134,6 +167,7 @@ const WalletManagement = () => {
             <th>Account Reference</th>
             <th>Currency Code</th>
             <th>Balance</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -144,11 +178,15 @@ const WalletManagement = () => {
               <td>{wallet.account_reference}</td>
               <td>{wallet.currency_code}</td>
               <td>{wallet.balance}</td>
+              <td>
+                <Button onClick={() => handleWalletClick(wallet)}>
+                  View Transactions
+                </Button>
+              </td>
             </tr>
           ))}
         </tbody>
       </Table>
-      {/* Pagination */}
       <div className="pagination">
         <button
           disabled={currentPage === 1}
@@ -164,6 +202,22 @@ const WalletManagement = () => {
           Next
         </button>
       </div>
+
+      <Modal isOpen={isModalOpen} toggle={toggleModal}>
+        <ModalBody>
+          <h5>Transactions for {selectedWallet?.email}</h5>
+          <ul>
+            {transactions.map((transaction) => (
+              <li key={transaction.id}>
+                <strong>{transaction.date}</strong>: {transaction.description}
+              </li>
+            ))}
+          </ul>
+          <Button color="primary" onClick={toggleModal}>
+            Close
+          </Button>
+        </ModalBody>
+      </Modal>
     </div>
   );
 };

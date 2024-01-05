@@ -23,6 +23,23 @@
     }
   }
 
+  .export-csv-button {
+    background-color: #51CC62; 
+    color: #fff; 
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .export-csv-button:hover {
+    background-color: #045e10; 
+  }
   .user-table {
     th {
       font-weight: bold;

@@ -58,6 +58,7 @@ const StockListing = () => {
     });
     setShowEditModal(true);
   };
+  
 
   const handleDetailsClick = (stock) => {
     setSelectedStock(stock);
@@ -73,42 +74,57 @@ const StockListing = () => {
   };
 
   const handleEditSubmit = () => {
-    // Retrieve the authentication token from localStorage
-    const adminAuthToken = localStorage.getItem("adminAuthToken");
-
-    // Check if the authentication token is available
-    if (adminAuthToken && selectedStock) {
-      // Fetch stock listings from the backend API using the admin token for authentication
-      axios
-        .put(
-          `https://api-staging.ramufinance.com/api/v1/admin/stocks/edit-stock-company/${selectedStock.id}`,
-          editFormData,
-          {
-            headers: {
-              Authorization: `Bearer ${adminAuthToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .then((response) => {
-          // Handle the response, e.g., show a success message
-          console.log("Stock edited successfully:", response.data);
-          setShowEditModal(false);
-          // Display a success alert
-          alert("Stock edited successfully!");
-        })
-        .catch((error) => {
-          console.error("Error editing stock:", error);
+    // Check if selectedStock and selectedStock.id are defined
+    if (selectedStock && selectedStock.id) {
+      // Check if required fields are filled in
+      if (editFormData.company_name && editFormData.ticker_id && editFormData.exchange_code) {
+        // Retrieve the authentication token from localStorage
+        const adminAuthToken = localStorage.getItem("adminAuthToken");
+  
+        // Check if the authentication token is available
+        if (adminAuthToken) {
+          // Fetch stock listings from the backend API using the admin token for authentication
+          axios
+            .put(
+              `https://api-staging.ramufinance.com/api/v1/admin/stocks/edit-stock-company/${selectedStock.id}`,
+              editFormData,
+              {
+                headers: {
+                  Authorization: `Bearer ${adminAuthToken}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+            .then((response) => {
+              // Handle the response, e.g., show a success message
+              console.log("Stock edited successfully:", response.data);
+              setShowEditModal(false);
+              // Display a success alert
+              alert("Stock edited successfully!");
+            })
+            .catch((error) => {
+              console.error("Error editing stock:", error);
+              // Display an error alert
+              alert("Error editing stock. Please try again.");
+            });
+        } else {
+          // Handle case where authentication token is not available
+          console.error("Authentication token is missing.");
           // Display an error alert
-          alert("Error editing stock. Please try again.");
-        });
+          alert("Authentication token is missing.");
+        }
+      } else {
+        // Display an error alert if required fields are not filled in
+        alert("Please fill in all required fields.");
+      }
     } else {
-      // Handle case where authentication token is not available or stock is not selected
-      console.error("Authentication token is missing or stock not selected.");
+      // Handle case where selectedStock or selectedStock.id is not defined
+      console.error("Selected stock or stock ID is missing.");
       // Display an error alert
-      alert("Authentication token is missing or stock not selected.");
+      alert("Selected stock or stock ID is missing.");
     }
   };
+  
 
   return (
     <div className="wallet-management">
@@ -116,6 +132,7 @@ const StockListing = () => {
       <table className="wallet-management__table">
         <thead>
           <tr>
+            <th>ID</th>
             <th>Company Name</th>
             <th>Ticker ID</th>
             <th>Exchange Code</th>
@@ -126,6 +143,7 @@ const StockListing = () => {
         <tbody>
           {stockListings.map((stock) => (
             <tr key={stock.id}>
+              <td>{stock.id}</td>
               <td>{stock.company_name}</td>
               <td>{stock.ticker_id}</td>
               <td>{stock.exchange_code}</td>

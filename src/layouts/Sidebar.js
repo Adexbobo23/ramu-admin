@@ -314,6 +314,18 @@ const Sidebar = () => {
                     <span className="ms-3 d-inline-block">Market Markup</span>
                   </Link>
                 </NavItem>
+                <NavItem>
+                  <Link
+                    to="/add-stock"
+                    className={
+                      location.pathname === "/add-stock"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Add Stock</span>
+                  </Link>
+                </NavItem>
               </Nav>
             </Collapse>
           </NavItem>

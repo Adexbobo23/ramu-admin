@@ -1,23 +1,10 @@
-// AllBlog.js
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, ModalHeader, ModalBody, Button } from "reactstrap";
+import axios from "axios";
 import "../ComStyle/AllBlog.scss";
 
-const demoBlogs = [
-  {
-    id: 1,
-    title: "Getting Started with React",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-  },
-  {
-    id: 2,
-    title: "Styling React Components with Sass",
-    content: "Sass provides powerful features for styling React components...",
-  },
-];
-
 const AllBlog = () => {
+  const [blogs, setBlogs] = useState([]);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -40,14 +27,48 @@ const AllBlog = () => {
     toggleEditModal();
   };
 
+  const fetchBlogPosts = async () => {
+    try {
+      const adminToken = localStorage.getItem("adminAuthToken");
+
+      if (!adminToken) {
+        console.error("Admin token not available");
+        return;
+      }
+
+      const response = await axios.get(
+        "https://api-staging.ramufinance.com/api/v1/blog-posts",
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.data.status) {
+        setBlogs(response.data.data);
+      } else {
+        console.error("Error fetching blog posts:", response.data.message);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching blog posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []); // Run once when the component mounts
+
   return (
     <div className="all-blog-container">
       <h1>All Blog Posts</h1>
       <div className="blog-list">
-        {demoBlogs.map((blog) => (
+        {blogs.map((blog) => (
           <div key={blog.id} className="blog-item">
             <h2>{blog.title}</h2>
-            <p>{blog.content}</p>
+            <p>{blog.thumbnail_image}</p>
+            <p>{blog.body}</p>
+            <p>{blog.created_at}</p>
             <div className="blog-actions">
               <Button color="success" onClick={() => openViewModal(blog)}>
                 View
@@ -65,7 +86,7 @@ const AllBlog = () => {
         <ModalHeader toggle={toggleViewModal}>View Blog</ModalHeader>
         <ModalBody>
           <h2>{selectedBlog?.title}</h2>
-          <p>{selectedBlog?.content}</p>
+          <p>{selectedBlog?.body}</p>
         </ModalBody>
       </Modal>
 
@@ -75,7 +96,7 @@ const AllBlog = () => {
         <ModalBody>
           {/* Add your edit form or components here */}
           <h2>Edit: {selectedBlog?.title}</h2>
-          <p>{selectedBlog?.content}</p>
+          <p>{selectedBlog?.body}</p>
         </ModalBody>
       </Modal>
     </div>
