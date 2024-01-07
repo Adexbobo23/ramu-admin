@@ -6,7 +6,7 @@ const CreateEmailTemplate = () => {
   const [templateData, setTemplateData] = useState({
     name: "",
     description: "",
-    content: "",
+    content: "This is a placeholder content",
   });
 
   const [error, setError] = useState(null);
@@ -22,41 +22,41 @@ const CreateEmailTemplate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const adminAuthToken = localStorage.getItem("adminAuthToken");
-  
+
       if (!adminAuthToken) {
         setError("Authentication token not available");
         return;
       }
-  
+
       // Omit the "id" field from the payload
       const { id, ...payloadWithoutId } = templateData;
-  
+
       const response = await axios.post(
         "https://api-staging.ramufinance.com/api/v1/admin/create-email-template",
-        payloadWithoutId, // Use the payload without the "id" field
+        payloadWithoutId,
         {
           headers: {
             Authorization: `Bearer ${adminAuthToken}`,
           },
         }
       );
-  
+
       if (response.status === 201) {
         setSuccess("Email template created successfully");
         setTemplateData({
           name: "",
           description: "",
-          content: "",
+          content: "This is a placeholder content",
         });
       } else {
         setError(`Error creating email template. Status: ${response.status}`);
       }
     } catch (error) {
       console.error("An error occurred while creating the email template:", error);
-  
+
       if (error.response) {
         setError(`Request failed with status: ${error.response.status}`);
         console.error("Response data:", error.response.data);
@@ -69,7 +69,6 @@ const CreateEmailTemplate = () => {
       }
     }
   };
-  
 
   return (
     <div>
@@ -119,4 +118,3 @@ const CreateEmailTemplate = () => {
 };
 
 export default CreateEmailTemplate;
-

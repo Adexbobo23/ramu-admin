@@ -20,12 +20,36 @@ const CreateBlog = () => {
     setBlogData({ ...blogData, media: file });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add logic to handle form submission (e.g., API call to create a new blog post)
-    console.log("Blog Data:", blogData);
-    // Reset form data after submission
-    setBlogData({ title: "", content: "", media: null });
+
+    const formData = new FormData();
+    formData.append("title", blogData.title);
+    formData.append("thumbnail_image", blogData.media);
+    formData.append("body", blogData.content);
+
+    const adminAuthToken = localStorage.getItem("adminAuthToken");
+
+    try {
+      const response = await fetch("https://api-staging.ramufinance.com/api/v1/create-blog-post", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${adminAuthToken}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Blog post created successfully");
+        // Reset form data after successful submission
+        setBlogData({ title: "", content: "", media: null });
+      } else {
+        alert("Error creating blog post");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      alert("An error occurred. Please try again later.");
+    }
   };
 
   return (

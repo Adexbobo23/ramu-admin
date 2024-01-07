@@ -4,7 +4,7 @@ import axios from "axios";
 import "../ComStyle/WalletManagement.scss";
 
 const WalletManagement = () => {
-  const itemsPerPage = 10; // Number of items to display per page
+  const itemsPerPage = 10;
   const [originalWallets, setOriginalWallets] = useState([]);
   const [filteredWallets, setFilteredWallets] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,8 +13,6 @@ const WalletManagement = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState(null);
-  const [transactions, setTransactions] = useState([]);
-
 
   const fetchWallets = async () => {
     try {
@@ -30,8 +28,6 @@ const WalletManagement = () => {
 
       const data = response.data.data;
       setOriginalWallets(data);
-
-      // Apply filters based on the selected currency and search query
       applyFilters(data);
     } catch (error) {
       console.error("Error fetching wallets:", error);
@@ -43,21 +39,18 @@ const WalletManagement = () => {
   }, []);
 
   useEffect(() => {
-    // Apply filters when selectedCurrency or searchQuery changes
     applyFilters(originalWallets);
   }, [selectedCurrency, searchQuery, originalWallets, currentPage]);
 
   const applyFilters = (data) => {
     let filteredData = data;
 
-    // Filter wallets based on the selected currency
     if (selectedCurrency) {
       filteredData = filteredData.filter(
         (wallet) => wallet.currency_code.toLowerCase() === selectedCurrency.toLowerCase()
       );
     }
 
-    // Filter wallets based on the search query
     if (searchQuery) {
       filteredData = filteredData.filter((wallet) => {
         const emailMatch = wallet.email.toLowerCase().includes(searchQuery.toLowerCase());
@@ -70,7 +63,6 @@ const WalletManagement = () => {
       });
     }
 
-    // Apply pagination
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     setFilteredWallets(filteredData.slice(startIndex, endIndex));
@@ -78,7 +70,6 @@ const WalletManagement = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Trigger a re-fetch when the search query changes
     fetchWallets();
   };
 
@@ -90,36 +81,15 @@ const WalletManagement = () => {
     setCurrentPage(pageNumber);
   };
 
-  const fetchTransactions = async (walletId) => {
-    try {
-      const adminAuthToken = localStorage.getItem("adminAuthToken");
-      const response = await axios.get(
-        `https://api-staging.ramufinance.com/api/v1/admin/fetch-transactions?walletId=${walletId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${adminAuthToken}`,
-          },
-        }
-      );
-
-      const data = response.data.data;
-      setTransactions(data);
-      toggleModal();
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-    }
-  };
-
   const handleWalletClick = (wallet) => {
     setSelectedWallet(wallet);
-    fetchTransactions(wallet.id);
+    toggleModal();
   };
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  // Calculate the total number of pages based on the number of items and itemsPerPage
   const totalPages = Math.ceil(filteredWallets.length / itemsPerPage);
 
   return (
@@ -180,7 +150,7 @@ const WalletManagement = () => {
               <td>{wallet.balance}</td>
               <td>
                 <Button onClick={() => handleWalletClick(wallet)}>
-                  View Transactions
+                  View Wallet Details
                 </Button>
               </td>
             </tr>
@@ -205,14 +175,12 @@ const WalletManagement = () => {
 
       <Modal isOpen={isModalOpen} toggle={toggleModal}>
         <ModalBody>
-          <h5>Transactions for {selectedWallet?.email}</h5>
-          <ul>
-            {transactions.map((transaction) => (
-              <li key={transaction.id}>
-                <strong>{transaction.date}</strong>: {transaction.description}
-              </li>
-            ))}
-          </ul>
+          <h5>Wallet Details</h5>
+          <p><strong>Email:</strong> {selectedWallet?.email}</p>
+          <p><strong>Wallet Address:</strong> {selectedWallet?.wallet_address}</p>
+          <p><strong>Account Reference:</strong> {selectedWallet?.account_reference}</p>
+          <p><strong>Currency Code:</strong> {selectedWallet?.currency_code}</p>
+          <p><strong>Balance:</strong> {selectedWallet?.balance}</p>
           <Button color="primary" onClick={toggleModal}>
             Close
           </Button>

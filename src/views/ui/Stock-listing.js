@@ -17,6 +17,8 @@ const StockListing = () => {
   });
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredStockListings, setFilteredStockListings] = useState([]);
 
   useEffect(() => {
     // Retrieve the authentication token from localStorage
@@ -35,6 +37,8 @@ const StockListing = () => {
         .then((response) => {
           // Update the stock listings state with the fetched data
           setStockListings(response.data.data);
+          // Ensure filteredStockListings is updated initially
+          setFilteredStockListings(response.data.data);
         })
         .catch((error) => {
           console.error("Error fetching stock listings:", error);
@@ -58,7 +62,6 @@ const StockListing = () => {
     });
     setShowEditModal(true);
   };
-  
 
   const handleDetailsClick = (stock) => {
     setSelectedStock(stock);
@@ -80,7 +83,7 @@ const StockListing = () => {
       if (editFormData.company_name && editFormData.ticker_id && editFormData.exchange_code) {
         // Retrieve the authentication token from localStorage
         const adminAuthToken = localStorage.getItem("adminAuthToken");
-  
+
         // Check if the authentication token is available
         if (adminAuthToken) {
           // Fetch stock listings from the backend API using the admin token for authentication
@@ -124,11 +127,33 @@ const StockListing = () => {
       alert("Selected stock or stock ID is missing.");
     }
   };
-  
+
+  const handleSearchInputChange = (e) => {
+    const input = e.target.value.toLowerCase();
+    setSearchInput(input);
+
+    // Filter stock listings based on the search input
+    const filteredStocks = stockListings.filter(
+      (stock) =>
+        stock.company_name.toLowerCase().includes(input) ||
+        stock.ticker_id.toLowerCase().includes(input) ||
+        stock.exchange_code.toLowerCase().includes(input) ||
+        stock.description.toLowerCase().includes(input)
+    );
+    setFilteredStockListings(filteredStocks);
+  };
 
   return (
     <div className="wallet-management">
       <h1>Stock Listings</h1>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchInput}
+          onChange={handleSearchInputChange}
+        />
+      </div>
       <table className="wallet-management__table">
         <thead>
           <tr>
@@ -141,7 +166,7 @@ const StockListing = () => {
           </tr>
         </thead>
         <tbody>
-          {stockListings.map((stock) => (
+          {filteredStockListings.map((stock) => (
             <tr key={stock.id}>
               <td>{stock.id}</td>
               <td>{stock.company_name}</td>
@@ -205,7 +230,6 @@ const StockListing = () => {
                 onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
               />
             </Form.Group>
-            {/* Add more form fields as needed */}
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -229,7 +253,6 @@ const StockListing = () => {
           <p><strong>Ticker ID:</strong> {selectedStock?.ticker_id}</p>
           <p><strong>Exchange Code:</strong> {selectedStock?.exchange_code}</p>
           <p><strong>Description:</strong> {selectedStock?.description}</p>
-          {/* Add more details as needed */}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleDetailsClose}>
