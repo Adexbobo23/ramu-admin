@@ -133,6 +133,45 @@ const UserList = () => {
       alert(`An error occurred while suspending user: ${error.message}`);
     }
   };
+
+  const handleUnsuspend = async (userId) => {
+    try {
+      const adminToken = localStorage.getItem("adminAuthToken");
+
+      if (!adminToken) {
+        console.error("Admin token not available");
+        alert("Admin token not available");
+        return;
+      }
+
+      const unsuspendPayload = {
+        user_id: userId,
+      };
+
+      const response = await axios.post(
+        "https://api-staging.ramufinance.com/api/v1/admin/us-suspend-user",
+        unsuspendPayload,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log(`User with ID ${userId} unsuspended successfully`);
+        // Refresh the user list
+        fetchUsers(activePage);
+        alert("User unsuspended successfully");
+      } else {
+        console.error("Error unsuspending user:", response.data.message);
+        alert(`Error unsuspending user: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error("An error occurred while unsuspending user:", error);
+      alert(`An error occurred while unsuspending user: ${error.message}`);
+    }
+  };
   
   const handleDelete = async (userId) => {
     try {
@@ -206,6 +245,8 @@ const UserList = () => {
     }
   };
 
+  
+
   return (
     <div className="user-list-container">
       <h1>All Users</h1>
@@ -259,6 +300,13 @@ const UserList = () => {
                     color="warning"
                   >
                     Suspend
+                  </Button>{" "}
+                  <Button
+                    className="unsuspend-btn"
+                    onClick={() => handleUnsuspend(user.id)}
+                    color="success"
+                  >
+                    Unsuspend
                   </Button>{" "}
                   <Button
                     className="delete-btn"

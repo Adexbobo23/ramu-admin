@@ -107,7 +107,7 @@ const Header = () => {
             ></img>
           </DropdownToggle>
           <DropdownMenu>
-            <DropdownItem header>Info</DropdownItem>
+            {/* <DropdownItem header>Info</DropdownItem>
             <Link to="/my-account" className="nav-link">
               <DropdownItem>My Account</DropdownItem>
             </Link>
@@ -115,7 +115,7 @@ const Header = () => {
             <Link to="/edit-profile" className="nav-link">
               <DropdownItem>Edit Profile</DropdownItem>
             </Link>
-            <DropdownItem divider />
+            <DropdownItem divider /> */}
             {/* <Link to="/role-management" className="nav-link">
             <DropdownItem>Edit Role</DropdownItem>
             </Link> */}

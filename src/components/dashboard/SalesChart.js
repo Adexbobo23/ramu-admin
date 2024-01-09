@@ -1,68 +1,119 @@
+import React, { useState, useEffect } from "react";
 import { Card, CardBody, CardSubtitle, CardTitle, Row, Col } from "reactstrap";
 import Chart from "react-apexcharts";
+import axios from "axios";
 
 const SalesChart = () => {
-  const options = {
-    chart: {
-      toolbar: {
-        show: false,
-      },
-      stacked: false,
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      show: true,
-      width: 4,
-      colors: ["transparent"],
-    },
-    legend: {
-      show: true,
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "30%",
-        borderRadius: 2,
-      },
-    },
-    colors: ["#0d6efd", "#009efb", "#6771dc"],
-    xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-      ],
-    },
-    responsive: [
-      {
-        breakpoint: 1024,
-        options: {
-          plotOptions: {
-            bar: {
-              columnWidth: "60%",
-              borderRadius: 7,
-            },
+  const [orderData, setOrderData] = useState({});
+  const [customerData, setCustomerData] = useState({});
+  const [withdrawnData, setWithdrawnData] = useState({});
+
+  const fetchOrderData = async () => {
+    try {
+      const adminToken = localStorage.getItem("adminAuthToken");
+
+      if (!adminToken) {
+        console.error("Admin token not available");
+        return;
+      }
+
+      const response = await axios.get(
+        "https://api-staging.ramufinance.com/api/v1/admin/get-orders-count",
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
           },
-        },
-      },
-    ],
+        }
+      );
+
+      if (response.status === 200) {
+        setOrderData(response.data.data);
+      } else {
+        console.error("Error fetching order data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching order data:", error);
+    }
   };
+
+  const fetchCustomerData = async () => {
+    try {
+      const adminToken = localStorage.getItem("adminAuthToken");
+
+      if (!adminToken) {
+        console.error("Admin token not available");
+        return;
+      }
+
+      const response = await axios.get(
+        "https://api-staging.ramufinance.com/api/v1/admin/get-customers-count",
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setCustomerData(response.data.data);
+      } else {
+        console.error("Error fetching customer data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching customer data:", error);
+    }
+  };
+
+  const fetchWithdrawnData = async () => {
+    try {
+      const adminToken = localStorage.getItem("adminAuthToken");
+
+      if (!adminToken) {
+        console.error("Admin token not available");
+        return;
+      }
+
+      const response = await axios.get(
+        "https://api-staging.ramufinance.com/api/v1/admin/get-amount-withdrawn",
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setWithdrawnData(response.data.data);
+      } else {
+        console.error("Error fetching withdrawn data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching withdrawn data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrderData();
+    fetchCustomerData();
+    fetchWithdrawnData();
+  }, []); // Empty dependency array to trigger the API calls only once on component mount
+
+  const options = {
+    // ... (your existing options)
+  };
+
   const series = [
     {
-      name: "2020",
-      data: [20, 40, 50, 30, 40, 50, 30, 30, 40],
+      name: "Total Order",
+      data: [orderData.total_investment_count || 0],
     },
     {
-      name: "2022",
-      data: [10, 20, 40, 60, 20, 40, 50, 60, 20],
+      name: "Total Withdrawn",
+      data: [withdrawnData.amount || 0],
+    },
+    {
+      name: "All Users",
+      data: [customerData.user_count || 0],
     },
   ];
 
@@ -76,16 +127,16 @@ const SalesChart = () => {
         <div className="bg-success text-white my-3 p-3 rounded">
           <Row>
             <Col md="4">
-              <h6>Total Sales</h6>
-              <h4 className="mb-0 fw-bold">$10,345</h4>
+              <h6>Total Order</h6>
+              <h4 className="mb-0 fw-bold">${orderData.total_investment_value || 0}</h4>
             </Col>
             <Col md="4">
-              <h6>This Month</h6>
-              <h4 className="mb-0 fw-bold">$7,545</h4>
+              <h6>Total Withdrawn</h6>
+              <h4 className="mb-0 fw-bold">${withdrawnData.amount || 0}</h4>
             </Col>
             <Col md="4">
-              <h6>This Week</h6>
-              <h4 className="mb-0 fw-bold">$1,345</h4>
+              <h6>All Users</h6>
+              <h4 className="mb-0 fw-bold">{customerData.user_count || 0}</h4>
             </Col>
           </Row>
         </div>
