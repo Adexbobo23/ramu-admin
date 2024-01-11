@@ -9,11 +9,10 @@ const UserDetails = () => {
   const [roles, setRoles] = useState([]);
 
   useEffect(() => {
-    
     const fetchUserRoles = async () => {
       try {
         const adminAuthToken = localStorage.getItem("adminAuthToken");
-    
+
         if (adminAuthToken) {
           const response = await axios.get(
             "https://api-staging.ramufinance.com/api/v1/admin/roles",
@@ -38,11 +37,14 @@ const UserDetails = () => {
         }
       }
     };
-    
-    
 
     fetchUserRoles();
-  }, );
+  }, []);
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   if (roles.length === 0) {
     return <div>Loading user role details...</div>;
@@ -69,8 +71,8 @@ const UserDetails = () => {
               <td>{role.name}</td>
               <td>{role.display_name}</td>
               <td>{role.description}</td>
-              <td>{role.created_at}</td>
-              <td>{role.updated_at}</td>
+              <td>{formatDate(role.created_at)}</td>
+              <td>{formatDate(role.updated_at)}</td>
             </tr>
           ))}
         </tbody>

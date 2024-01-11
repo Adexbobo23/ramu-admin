@@ -10,6 +10,7 @@ const Sidebar = () => {
   const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
   const [blogDropdownOpen, setBlogDropdownOpen] = useState(false);
   const [emailTemplateDropdownOpen, setEmailTemplateDropdownOpen] = useState(false);
+  const [kycDropdownOpen, setKycDropdownOpen] = useState(false);
 
   // Function to toggle the Role Management dropdown
   const toggleRoleDropdown = () => {
@@ -32,6 +33,10 @@ const Sidebar = () => {
     setEmailTemplateDropdownOpen(!emailTemplateDropdownOpen);
   };
 
+  const toggleKycDropdown = () => {
+    setKycDropdownOpen(!kycDropdownOpen);
+  };
+
   return (
     <div className="bg-dark">
       <div className="mt-auto">
@@ -48,21 +53,7 @@ const Sidebar = () => {
               <i className="bi bi-speedometer2"></i>
               <span className="ms-3 d-inline-block">Dashboard Overview</span>
             </Link>
-          </NavItem>
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/kyc"
-              className={
-                location.pathname === "/kyc-requirements"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-person-badge"></i>
-              <span className="ms-3 d-inline-block">KYC</span>
-            </Link>
-          </NavItem>
-          
+          </NavItem>    
           <NavItem className="sidenav-bg">
             <Link
               to="/user-list"
@@ -90,57 +81,69 @@ const Sidebar = () => {
             </Link>
           </NavItem>
 
-          {/* Blog Management Dropdown */}
+           {/* KYC Management Section */}
           <NavItem className="sidenav-bg">
             <Link
               to="#"
-              onClick={toggleBlogDropdown}
+              onClick={toggleKycDropdown}
               className={
-                location.pathname === "/all-blogs" ||
-                location.pathname === "/create-blog"
+                location.pathname === "/kyc" || location.pathname === "/all-settle"
                   ? "active nav-link py-3"
                   : "nav-link py-3"
               }
             >
               <i className="bi bi-pencil"></i>
-              <span className="ms-3 d-inline-block">Blog Management</span>
+              <span className="ms-3 d-inline-block">KYC Management</span>
               <i
                 className={`bi ${
-                  blogDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+                  kycDropdownOpen ? "bi-caret-up" : "bi-caret-down"
                 } ms-2 ms-auto`}
               ></i>
             </Link>
 
-            {/* Collapse component for the Blog Management dropdown */}
-            <Collapse isOpen={blogDropdownOpen}>
+            {/* Collapse component for the KYC Management dropdown */}
+            <Collapse isOpen={kycDropdownOpen}>
               <Nav vertical className="pl-4">
                 <NavItem>
                   <Link
-                    to="/all-blogs"
+                    to="/kyc"
                     className={
-                      location.pathname === "/all-blogs"
-                        ? "active nav-link py-2"
-                        : "nav-link py-2"
+                      location.pathname === "/kyc"
+                        ? "active nav-link py-3"
+                        : "nav-link py-3"
                     }
                   >
-                    <span className="ms-3 d-inline-block">All Blogs</span>
+                    <span className="ms-3 d-inline-block">KYC</span>
                   </Link>
                 </NavItem>
                 <NavItem>
                   <Link
-                    to="/create-blog"
+                    to="/transaction-reset"
                     className={
-                      location.pathname === "/create-blog"
-                        ? "active nav-link py-2"
-                        : "nav-link py-2"
+                      location.pathname === "/transaction-reset"
+                        ? "active nav-link py-3"
+                        : "nav-link py-3"
                     }
                   >
-                    <span className="ms-3 d-inline-block">Create Blog</span>
+                    <span className="ms-3 d-inline-block">Transaction Pin</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link
+                    to="/all-settle"
+                    className={
+                      location.pathname === "/all-settle"
+                        ? "active nav-link py-3"
+                        : "nav-link py-3"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">All Settlements accounts</span>
                   </Link>
                 </NavItem>
               </Nav>
             </Collapse>
           </NavItem>
+
            {/* Email Template Dropdown */}
            <NavItem className="sidenav-bg">
             <Link
@@ -205,6 +208,58 @@ const Sidebar = () => {
               <i className="bi bi-person-badge"></i>
               <span className="ms-3 d-inline-block">Wallet Management</span>
             </Link>
+          </NavItem>
+
+          {/* Blog Management Dropdown */}
+          <NavItem className="sidenav-bg">
+            <Link
+              to="#"
+              onClick={toggleBlogDropdown}
+              className={
+                location.pathname === "/kyc" ||
+                location.pathname === "/create-blog"
+                  ? "active nav-link py-3"
+                  : "nav-link py-3"
+              }
+            >
+              <i className="bi bi-pencil"></i>
+              <span className="ms-3 d-inline-block">Blog Management</span>
+              <i
+                className={`bi ${
+                  blogDropdownOpen ? "bi-caret-up" : "bi-caret-down"
+                } ms-2 ms-auto`}
+              ></i>
+            </Link>
+
+            {/* Collapse component for the Blog Management dropdown */}
+            <Collapse isOpen={blogDropdownOpen}>
+              <Nav vertical className="pl-4">
+                <NavItem>
+                  <Link
+                    to="/all-blogs"
+                    className={
+                      location.pathname === "/all-blogs"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">All Blogs</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link
+                    to="/create-blog"
+                    className={
+                      location.pathname === "/create-blog"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Create Blog</span>
+                  </Link>
+                </NavItem>
+              </Nav>
+            </Collapse>
           </NavItem>
 
           <NavItem className="sidenav-bg">
@@ -301,7 +356,19 @@ const Sidebar = () => {
                   <span className="ms-3 d-inline-block">Stock List</span>
                 </Link>
               </NavItem>
-              
+              <NavItem className="sidenav-bg">
+                <Link
+                  to="/all-sector"
+                  className={
+                    location.pathname === "/all-sector"
+                      ? "active nav-link py-3"
+                      : "nav-link py-3"
+                  }
+                >
+                  {/* <i className="bi bi-patch-check"></i> */}
+                  <span className="ms-3 d-inline-block">Sectors</span>
+                </Link>
+              </NavItem>
                 <NavItem>
                   <Link
                     to="/market-markup"

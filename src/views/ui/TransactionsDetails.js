@@ -13,7 +13,6 @@ const TransactionDetails = ({ transactionId }) => {
   const transactionsPerPage = 10;
   const [selectedDate, setSelectedDate] = useState(null);
 
-
   const handleExportCSV = () => {
     // Check if there is data to export
     if (filteredTransaction.length === 0) {
@@ -70,7 +69,18 @@ const TransactionDetails = ({ transactionId }) => {
           }
         );
 
-        const transactionData = response.data.data;
+        const transactionData = response.data.data.map((transactionItem) => ({
+          ...transactionItem,
+          created_at: new Date(transactionItem.created_at).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            timeZoneName: 'short',
+          }),
+        }));
 
         setTransaction(transactionData);
         setFilteredTransaction(transactionData);

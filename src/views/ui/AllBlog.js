@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Modal, ModalHeader, ModalBody, Button, Form, FormGroup, Label, Input } from "reactstrap";
 import axios from "axios";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; 
 import "../ComStyle/AllBlog.scss";
 import { MdCloudUpload } from "react-icons/md";
 
+const ITEMS_PER_PAGE = 3;
 
 const AllBlog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -15,6 +18,18 @@ const AllBlog = () => {
     thumbnail_image: "",
     body: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [expandedBlogs, setExpandedBlogs] = useState([]);
+
+  const toggleExpand = (blogId) => {
+    setExpandedBlogs((prevExpanded) => {
+      if (prevExpanded.includes(blogId)) {
+        return prevExpanded.filter((id) => id !== blogId);
+      } else {
+        return [...prevExpanded, blogId];
+      }
+    });
+  };
 
   const toggleViewModal = () => {
     setIsViewModalOpen(!isViewModalOpen);
@@ -112,15 +127,27 @@ const AllBlog = () => {
     setEditedBlogData({ ...editedBlogData, thumbnail_image: file });
   };
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const indexOfLastBlog = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstBlog = indexOfLastBlog - ITEMS_PER_PAGE;
+  const currentBlogs = blogs.slice(indexOfFirstBlog, indexOfLastBlog);
+
   return (
     <div className="all-blog-container">
       <h1>All Blog Posts</h1>
       <div className="blog-list">
-        {blogs.map((blog) => (
+        {currentBlogs.map((blog) => (
           <div key={blog.id} className="blog-item">
-            <h2>{blog.title}</h2>
+            <h2 className="title">{blog.title}</h2>
             <p>{blog.thumbnail_image}</p>
-            <p>{blog.body}</p>
+            <p>
+              {expandedBlogs.includes(blog.id)
+                ? blog.body // Show full body when expanded
+                : blog.body.slice(0, 500) + (blog.body.length > 500 ? "..." : "")}
+            </p>
             <p>{blog.created_at}</p>
             <div className="blog-actions">
               <Button color="success" onClick={() => openViewModal(blog)}>
@@ -132,6 +159,19 @@ const AllBlog = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="pagination-container">
+        <ul className="pagination">
+          {Array.from({ length: Math.ceil(blogs.length / ITEMS_PER_PAGE) }, (_, index) => (
+            <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+              <button className="page-link" onClick={() => handlePageChange(index + 1)}>
+                {index + 1}
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* View Blog Modal */}
@@ -161,12 +201,10 @@ const AllBlog = () => {
             </FormGroup>
             <FormGroup>
               <Label for="editContent">Content</Label>
-              <Input
-                type="textarea"
-                name="body"
-                id="editContent"
+              <ReactQuill
+                theme="snow"
                 value={editedBlogData.body}
-                onChange={handleEditInputChange}
+                onChange={(value) => setEditedBlogData({ ...editedBlogData, body: value })}
                 required
               />
             </FormGroup>

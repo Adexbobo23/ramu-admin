@@ -61,10 +61,8 @@ const UserRegistration = () => {
     e.preventDefault();
   
     try {
-      // Retrieve the authentication token from localStorage
       const adminAuthToken = localStorage.getItem("adminAuthToken");
   
-      // Check if the authentication token is available
       if (adminAuthToken) {
         const response = await axios.post(
           "https://api-staging.ramufinance.com/api/v1/admin/add-admin-user",
@@ -77,11 +75,10 @@ const UserRegistration = () => {
           }
         );
   
-        if (response.status === 201) {
+        if (response.status >= 200 && response.status < 300) {
           // User creation successful
           console.log("User created successfully:", response.data);
   
-          // Reset form after submission
           setFormData({
             user_name: "",
             first_name: "",
@@ -103,7 +100,6 @@ const UserRegistration = () => {
           alert("User creation failed. Please check the form data.");
         }
       } else {
-        // Handle case where authentication token is not available
         console.error("Authentication token is missing.");
         alert("User creation failed. Authentication token is missing.");
       }
@@ -113,7 +109,7 @@ const UserRegistration = () => {
         // that falls out of the range of 2xx
         console.error("Server responded with error status:", error.response.status);
         console.error("Response data:", error.response.data);
-  
+    
         // Display validation errors to the user
         if (error.response.data.message) {
           if (typeof error.response.data.message === "string") {
@@ -139,7 +135,9 @@ const UserRegistration = () => {
         alert("User creation failed. Error setting up the request.");
       }
     }
+    
   };
+  
   
   
 

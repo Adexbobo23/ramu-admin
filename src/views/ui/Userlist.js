@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Table, Form, FormGroup, Label, Input, Button, Modal, ModalBody } from "reactstrap";
+import {
+  Table,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Button,
+  Modal,
+  ModalBody,
+} from "reactstrap";
 import axios from "axios";
 import { CSVLink } from "react-csv";
 import ReactPaginate from "react-js-pagination";
@@ -28,6 +37,7 @@ const UserDetailsModal = ({ user, isOpen, toggle, onSendEmail }) => {
   );
 };
 
+
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,13 +47,14 @@ const UserList = () => {
   const [itemsCountPerPage, setItemsCountPerPage] = useState(10);
   const [totalItemsCount, setTotalItemsCount] = useState(0);
 
+
   const fetchUsers = async (page = 1) => {
     try {
       const authToken = localStorage.getItem("adminAuthToken");
 
       if (authToken) {
         const response = await axios.get(
-          `https://api-staging.ramufinance.com/api/v1/admin/users?page=${page}`,
+          `https://api-staging.ramufinance.com/api/v1/admin/users?page=${page}&limit=${itemsCountPerPage}`,
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -61,7 +72,9 @@ const UserList = () => {
             console.error("Invalid data format. Expected an array.");
           }
         } else if (response.status === 401) {
-          console.error("Unauthorized access. Please check authentication token.");
+          console.error(
+            "Unauthorized access. Please check authentication token."
+          );
         } else {
           console.error("Error fetching user data:", response.statusText);
         }
@@ -69,13 +82,17 @@ const UserList = () => {
         console.error("Authentication token is missing.");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      console.error(
+        "An error occurred while fetching user data:",
+        error.message
+      );
     }
   };
 
+
   useEffect(() => {
     fetchUsers(activePage);
-  }, [activePage]);
+  }, [activePage, itemsCountPerPage]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -86,29 +103,31 @@ const UserList = () => {
     setActivePage(pageNumber);
   };
 
-  // const handleUserClick = (user) => {
-  //   setSelectedUser(user);
-  //   setIsUserDetailsModalOpen(true);
-  // };
+  const handleItemsPerPageChange = (e) => {
+    const countPerPage = parseInt(e.target.value, 10);
+    setItemsCountPerPage(countPerPage);
+    setActivePage(1);
+  };
 
   const toggleUserDetailsModal = () => {
     setIsUserDetailsModalOpen(!isUserDetailsModalOpen);
   };
 
+
   const handleSuspend = async (userId) => {
     try {
       const adminToken = localStorage.getItem("adminAuthToken");
-  
+
       if (!adminToken) {
         console.error("Admin token not available");
         alert("Admin token not available");
         return;
       }
-  
+
       const suspendPayload = {
         user_id: userId,
       };
-  
+
       const response = await axios.post(
         "https://api-staging.ramufinance.com/api/v1/admin/suspend-user",
         suspendPayload,
@@ -118,7 +137,7 @@ const UserList = () => {
           },
         }
       );
-  
+
       if (response.status >= 200 && response.status < 300) {
         console.log(`User with ID ${userId} suspended successfully`);
         // Refresh the user list
@@ -129,7 +148,10 @@ const UserList = () => {
         alert(`Error suspending user: ${response.data.message}`);
       }
     } catch (error) {
-      console.error("An error occurred while suspending user:", error);
+      console.error(
+        "An error occurred while suspending user:",
+        error.message
+      );
       alert(`An error occurred while suspending user: ${error.message}`);
     }
   };
@@ -168,25 +190,28 @@ const UserList = () => {
         alert(`Error unsuspending user: ${response.data.message}`);
       }
     } catch (error) {
-      console.error("An error occurred while unsuspending user:", error);
+      console.error(
+        "An error occurred while unsuspending user:",
+        error.message
+      );
       alert(`An error occurred while unsuspending user: ${error.message}`);
     }
   };
-  
+
   const handleDelete = async (userId) => {
     try {
       const adminToken = localStorage.getItem("adminAuthToken");
-  
+
       if (!adminToken) {
         console.error("Admin token not available");
         alert("Admin token not available");
         return;
       }
-  
+
       const deletePayload = {
         user_id: userId,
       };
-  
+
       const response = await axios.delete(
         `https://api-staging.ramufinance.com/api/v1/admin/delete-user`,
         {
@@ -196,7 +221,7 @@ const UserList = () => {
           data: deletePayload,
         }
       );
-  
+
       if (response.status >= 200 && response.status < 300) {
         console.log(`User with ID ${userId} deleted successfully`);
         // Refresh the user list
@@ -211,17 +236,22 @@ const UserList = () => {
       alert(`An error occurred while deleting user: ${error.message}`);
     }
   };
-  
-  
- 
+
   const handleSendEmail = (email) => {
     console.log(`Sending email to: ${email}`);
+  };
+
+  const handleUserClick = (user, e) => {
+    // Your logic for handling user click
+    // You can set the selectedUser state or perform other actions
+    setSelectedUser(user);
+    setIsUserDetailsModalOpen(true);
   };
 
   const handleExportToCSV = () => {
     const csvData = [
       ["Name", "Username", "Email", "Phone Number", "Gender", "Status"],
-      ...users.map(user => [
+      ...users.map((user) => [
         `${user.first_name} ${user.last_name}`,
         user.user_name,
         user.email,
@@ -231,21 +261,38 @@ const UserList = () => {
       ]),
     ];
 
-    return <CSVLink data={csvData} filename={"user_data.csv"} className="export-csv-button">Export to CSV</CSVLink>;
+    return (
+      <CSVLink data={csvData} filename={"user_data.csv"} className="export-csv-button">
+        Export to CSV
+      </CSVLink>
+    );
   };
 
-  const handleUserClick = (user, e) => {
-    // Check if the click event comes from a button
-    const isButtonClicked = e.target.classList.contains('suspend-btn') || e.target.classList.contains('delete-btn');
-
-    if (!isButtonClicked) {
-      // Open the UserDetailsModal only if the click is not on a button
-      setSelectedUser(user);
-      setIsUserDetailsModalOpen(true);
+  const renderActionButton = (user) => {
+    if (user.status === "ACTIVE") {
+      return (
+        <Button
+          className="suspend-btn"
+          onClick={() => handleSuspend(user.id)}
+          color="warning"
+        >
+          Suspend
+        </Button>
+      );
+    } else if (user.status === "SUSPENDED") {
+      return (
+        <Button
+          className="unsuspend-btn"
+          onClick={() => handleUnsuspend(user.id)}
+          color="success"
+        >
+          Unsuspend
+        </Button>
+      );
     }
+    // Add more conditions if needed
+    return null;
   };
-
-  
 
   return (
     <div className="user-list-container">
@@ -268,9 +315,7 @@ const UserList = () => {
           </div>
         </FormGroup>
       </Form>
-      <div className="export-csv-container">
-        {handleExportToCSV()}
-      </div>
+      <div className="export-csv-container">{handleExportToCSV()}</div>
       <Table striped className="user-table">
         <thead>
           <tr>
@@ -294,20 +339,7 @@ const UserList = () => {
               <td>{user.status}</td>
               <td>
                 <div className="action-buttons">
-                  <Button
-                    className="suspend-btn"
-                    onClick={() => handleSuspend(user.id)}
-                    color="warning"
-                  >
-                    Suspend
-                  </Button>{" "}
-                  <Button
-                    className="unsuspend-btn"
-                    onClick={() => handleUnsuspend(user.id)}
-                    color="success"
-                  >
-                    Unsuspend
-                  </Button>{" "}
+                  {renderActionButton(user)}{" "}
                   <Button
                     className="delete-btn"
                     onClick={() => handleDelete(user.id)}
@@ -337,7 +369,7 @@ const UserList = () => {
           user={selectedUser}
           isOpen={isUserDetailsModalOpen}
           toggle={toggleUserDetailsModal}
-          onSendEmail={handleSendEmail} 
+          onSendEmail={handleSendEmail}
         />
       )}
     </div>

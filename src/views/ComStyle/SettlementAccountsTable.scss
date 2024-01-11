@@ -1,0 +1,21 @@
+@import "~bootstrap/scss/bootstrap"; 
+
+.settlement-accounts-table {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+
+  thead {
+    background-color: #51CC62; 
+    color: #fff;
+  }
+
+  tbody {
+    td {
+      button {
+        margin-right: 5px;
+      }
+    }
+  }
+}

@@ -99,21 +99,28 @@ const SalesChart = () => {
   }, []); // Empty dependency array to trigger the API calls only once on component mount
 
   const options = {
-    // ... (your existing options)
+    chart: {
+      type: "area",
+      height: 279,
+    },
+    xaxis: {
+      type: "datetime", // Set x-axis type to datetime
+    },
+    // ... (other existing options)
   };
 
   const series = [
     {
       name: "Total Order",
-      data: [orderData.total_investment_count || 0],
+      data: [{ x: new Date().getTime(), y: orderData.total_investment_count || 0 }],
     },
     {
       name: "Total Withdrawn",
-      data: [withdrawnData.amount || 0],
+      data: [{ x: new Date().getTime(), y: withdrawnData.amount || 0 }],
     },
     {
       name: "All Users",
-      data: [customerData.user_count || 0],
+      data: [{ x: new Date().getTime(), y: customerData.user_count || 0 }],
     },
   ];
 
@@ -132,7 +139,7 @@ const SalesChart = () => {
             </Col>
             <Col md="4">
               <h6>Total Withdrawn</h6>
-              <h4 className="mb-0 fw-bold">${withdrawnData.amount || 0}</h4>
+              <h4 className="mb-0 fw-bold">₦{withdrawnData.amount || 0}</h4>
             </Col>
             <Col md="4">
               <h6>All Users</h6>

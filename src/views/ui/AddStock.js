@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../ComStyle/AddStock.scss";
 
@@ -9,8 +9,41 @@ const AddStock = () => {
   const [companyName, setCompanyName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
-  const [sector, setSector] = useState("");
+  const [sectorOptions, setSectorOptions] = useState([]);
+  const [selectedSector, setSelectedSector] = useState("");
   const [logo, setLogo] = useState(null); // Change to null as it will hold a file
+
+  useEffect(() => {
+    const fetchSectors = async () => {
+      try {
+        const adminToken = localStorage.getItem("adminAuthToken");
+
+        if (!adminToken) {
+          console.error("Admin token not available");
+          return;
+        }
+
+        const response = await axios.get(
+          "https://api-staging.ramufinance.com/api/v1/get-sectors",
+          {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }
+        );
+
+        if (response.data.status) {
+          setSectorOptions(response.data.data);
+        } else {
+          console.error("Error fetching sectors:", response.data.message);
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching sectors:", error);
+      }
+    };
+
+    fetchSectors();
+  }, []);
 
   const handleAddStock = async () => {
     try {
@@ -29,7 +62,7 @@ const AddStock = () => {
       formData.append("company_name", companyName);
       formData.append("display_name", displayName);
       formData.append("description", description);
-      formData.append("sector", sector);
+      formData.append("sector", selectedSector);
       formData.append("logo", logo); 
 
       const response = await axios.post(
@@ -53,7 +86,7 @@ const AddStock = () => {
         setCompanyName("");
         setDisplayName("");
         setDescription("");
-        setSector("");
+        setSelectedSector("");
         setLogo(null); // Reset the file input
       } else {
         console.error("Error adding stock:", response.data.message);
@@ -130,12 +163,20 @@ const AddStock = () => {
         </div>
         <div className="form-group">
           <label htmlFor="sector">Sector</label>
-          <input
-            type="text"
+          <select
             id="sector"
-            value={sector}
-            onChange={(e) => setSector(e.target.value)}
-          />
+            value={selectedSector}
+            onChange={(e) => setSelectedSector(e.target.value)}
+          >
+            <option value="" disabled>
+              Select a Sector
+            </option>
+            {sectorOptions.map((sector) => (
+              <option key={sector.id} value={sector.name}>
+                {sector.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-group">
           <label htmlFor="logo">Logo</label>

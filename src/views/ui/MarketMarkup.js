@@ -92,6 +92,11 @@ const MarketMarkup = () => {
     setAlert({ show: false, variant: 'success', message: '' });
   };
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
     <div className="market-markup">
       <h1>Market Markup</h1>
@@ -115,10 +120,10 @@ const MarketMarkup = () => {
             <tr>
               <td>{marketMarkupData.id}</td>
               <td>{marketMarkupData.markup_percentage}</td>
-              <td>{marketMarkupData.created_at}</td>
-              <td>{marketMarkupData.updated_at}</td>
+              <td>{formatDate(marketMarkupData.created_at)}</td>
+              <td>{formatDate(marketMarkupData.updated_at)}</td>
               <td>
-                <button className="edit-btn"  onClick={handleEditClick}>
+                <button className="edit-btn" onClick={handleEditClick}>
                   Edit
                 </button>
               </td>

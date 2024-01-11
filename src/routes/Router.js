@@ -39,6 +39,9 @@ import GetAllEmailTemplates from "../views/ui/GetAllEmailTemplates.js";
 import CreateEmailTemplate from "../views/ui/CreateEmailTemplate.js";
 import ContactFormData from "../views/ui/ContactFormData.js";
 import ReportSpamData from "../views/ui/ReportSpamData.js";
+import SettlementAccountsTable from "../views/ui/SettlementAccountsTable.js";
+import Sectors from "../views/ui/Sectors.js";
+import TransactionPin from "../views/ui/TransactionPin.js";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
@@ -104,6 +107,9 @@ const ThemeRoutes = [
       { path: "/create-email-template", exact: true, element: <CreateEmailTemplate /> },
       { path: "/contact", exact: true, element: <ContactFormData/> },
       { path: "/report-scam", exact: true, element: <ReportSpamData /> },
+      { path: "/all-settle", exact: true, element: <SettlementAccountsTable /> },
+      { path: "/all-sector", exact: true, element: <Sectors /> },
+      { path: "/transaction-reset", exact: true, element: <TransactionPin /> },
     ],
   },
 ];

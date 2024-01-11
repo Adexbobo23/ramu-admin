@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { MdCloudUpload } from "react-icons/md";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import "../ComStyle/CreateBlog.scss";
 
 const CreateBlog = () => {
@@ -10,8 +12,7 @@ const CreateBlog = () => {
     media: null,
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = (name, value) => {
     setBlogData({ ...blogData, [name]: value });
   };
 
@@ -63,18 +64,16 @@ const CreateBlog = () => {
             name="title"
             id="title"
             value={blogData.title}
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange("title", e.target.value)}
             required
           />
         </FormGroup>
         <FormGroup>
           <Label for="content">Content</Label>
-          <Input
-            type="textarea"
-            name="content"
-            id="content"
+          <ReactQuill
+            theme="snow"
             value={blogData.content}
-            onChange={handleInputChange}
+            onChange={(value) => handleInputChange("content", value)}
             required
           />
         </FormGroup>

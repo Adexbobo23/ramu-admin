@@ -62,6 +62,7 @@ const AdminLogin = ({ onAuthentication }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        <br />
         <input
           type="password"
           placeholder="Password"
