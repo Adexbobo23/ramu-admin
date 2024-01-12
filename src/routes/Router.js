@@ -42,6 +42,8 @@ import ReportSpamData from "../views/ui/ReportSpamData.js";
 import SettlementAccountsTable from "../views/ui/SettlementAccountsTable.js";
 import Sectors from "../views/ui/Sectors.js";
 import TransactionPin from "../views/ui/TransactionPin.js";
+import AddSectorForm from "../views/ui/AddSectorForm.js";
+import GTNStock from "../views/ui/GTNStock.js";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
@@ -110,6 +112,8 @@ const ThemeRoutes = [
       { path: "/all-settle", exact: true, element: <SettlementAccountsTable /> },
       { path: "/all-sector", exact: true, element: <Sectors /> },
       { path: "/transaction-reset", exact: true, element: <TransactionPin /> },
+      { path: "/add-sectors", exact: true, element: <AddSectorForm /> },
+      { path: "/all-gtnstocks", exact: true, element: <GTNStock /> },
     ],
   },
 ];

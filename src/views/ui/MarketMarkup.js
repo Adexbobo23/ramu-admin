@@ -4,89 +4,97 @@ import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import '../ComStyle/MarketMarkup.scss';
 
 const MarketMarkup = () => {
-  const [marketMarkupData, setMarketMarkupData] = useState(null);
+  const [marketMarkupData, setMarketMarkupData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editFormData, setEditFormData] = useState({
     markup_percentage: '',
   });
   const [alert, setAlert] = useState({ show: false, variant: 'success', message: '' });
+  const [selectedMarkupId, setSelectedMarkupId] = useState(null);
 
   useEffect(() => {
-    // Retrieve the admin token from localStorage
-    const adminAuthToken = localStorage.getItem('adminAuthToken');
+    const fetchData = async () => {
+      try {
+        const adminAuthToken = localStorage.getItem('adminAuthToken');
 
-    if (adminAuthToken) {
-      // Fetch market markup data from the backend API using the admin token for authentication
-      axios
-        .get('https://api-staging.ramufinance.com/api/v1/admin/stocks/get-market-markup', {
-          headers: {
-            Authorization: `Bearer ${adminAuthToken}`,
-            'Content-Type': 'application/json',
-          },
-        })
-        .then((response) => {
-          // Update the market markup state with the fetched data
-          setMarketMarkupData(response.data.data);
-        })
-        .catch((error) => {
-          console.error('Error fetching market markup data:', error);
-          setAlert({ show: true, variant: 'danger', message: 'Error fetching market markup data' });
-        });
-    } else {
-      // Handle case where admin token is not available
-      console.error('Admin token is missing.');
-      setAlert({ show: true, variant: 'danger', message: 'Admin token is missing' });
-    }
-  }, []);
+        if (!adminAuthToken) {
+          console.error('Admin token is missing.');
+          throw new Error('Admin token is missing');
+        }
 
-  const handleEditClick = () => {
-    setShowModal(true);
-    setEditFormData({
-      markup_percentage: marketMarkupData.markup_percentage,
-    });
-  };
-
-  const handleEditClose = () => {
-    setShowModal(false);
-  };
-
-  const handleEditSubmit = () => {
-    // Retrieve the admin token from localStorage
-    const adminAuthToken = localStorage.getItem('adminAuthToken');
-
-    if (adminAuthToken && marketMarkupData) {
-      // Fetch market markup data from the backend API using the admin token for authentication
-      axios
-        .put(
-          `https://api-staging.ramufinance.com/api/v1/admin/stocks/edit-market-markup/${marketMarkupData.id}`,
-          editFormData,
+        const response = await axios.get(
+          'https://api-staging.ramufinance.com/api/v1/admin/stocks/get-market-markup',
           {
             headers: {
               Authorization: `Bearer ${adminAuthToken}`,
               'Content-Type': 'application/json',
             },
           }
-        )
-        .then((response) => {
-          // Handle the response, e.g., show a success message
-          console.log('Market markup edited successfully:', response.data);
-          setShowModal(false);
-          setAlert({ show: true, variant: 'success', message: 'Market markup edited successfully' });
-        })
-        .catch((error) => {
-          console.error('Error editing market markup:', error);
-          setAlert({ show: true, variant: 'danger', message: 'Error editing market markup' });
-        });
-    } else {
-      // Handle case where admin token is not available or market markup data is not present
-      console.error('Admin token is missing or market markup data is not present.');
-      setAlert({
-        show: true,
-        variant: 'danger',
-        message: 'Admin token is missing or market markup data is not present',
-      });
+        );
+
+        setMarketMarkupData(response.data.data);
+      } catch (error) {
+        console.error('Error fetching market markup data:', error);
+        setAlert({ show: true, variant: 'danger', message: 'Error fetching market markup data' });
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleEditClick = (data) => {
+    setShowModal(true);
+    setEditFormData({
+      markup_percentage: data.markup_percentage,
+    });
+    setSelectedMarkupId(data.id);
+  };
+
+  const handleEditClose = () => {
+    setShowModal(false);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const adminAuthToken = localStorage.getItem('adminAuthToken');
+
+      if (!adminAuthToken || !selectedMarkupId) {
+        console.error('Admin token is missing or selected markup ID is not present.');
+        throw new Error('Admin token is missing or selected markup ID is not present');
+      }
+
+      await axios.put(
+        `https://api-staging.ramufinance.com/api/v1/admin/stocks/edit-market-markup/${selectedMarkupId}`, 
+        editFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${adminAuthToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // Refetch the updated data after a successful edit
+      const updatedResponse = await axios.get(
+        'https://api-staging.ramufinance.com/api/v1/admin/stocks/get-market-markup',
+        {
+          headers: {
+            Authorization: `Bearer ${adminAuthToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      setMarketMarkupData(updatedResponse.data.data);
+      setShowModal(false);
+      setAlert({ show: true, variant: 'success', message: 'Market markup edited successfully' });
+    } catch (error) {
+      console.error('Error editing market markup:', error);
+      setAlert({ show: true, variant: 'danger', message: 'Error editing market markup' });
     }
   };
+
+
 
   const handleAlertClose = () => {
     setAlert({ show: false, variant: 'success', message: '' });
@@ -105,11 +113,12 @@ const MarketMarkup = () => {
           {alert.message}
         </Alert>
       )}
-      {marketMarkupData && (
+      {marketMarkupData.length > 0 && (
         <table className="market-markup__table">
           <thead>
             <tr>
               <th>ID</th>
+              <th>Category</th>
               <th>Markup Percentage</th>
               <th>Created At</th>
               <th>Updated At</th>
@@ -117,17 +126,20 @@ const MarketMarkup = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>{marketMarkupData.id}</td>
-              <td>{marketMarkupData.markup_percentage}</td>
-              <td>{formatDate(marketMarkupData.created_at)}</td>
-              <td>{formatDate(marketMarkupData.updated_at)}</td>
-              <td>
-                <button className="edit-btn" onClick={handleEditClick}>
-                  Edit
-                </button>
-              </td>
-            </tr>
+            {marketMarkupData.map((data) => (
+              <tr key={data.id}>
+                <td>{data.id}</td>
+                <td>{data.category}</td>
+                <td>{data.markup_percentage}</td>
+                <td>{formatDate(data.created_at)}</td>
+                <td>{formatDate(data.updated_at)}</td>
+                <td>
+                  <button className="edit-btn" onClick={() => handleEditClick(data)}>
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}

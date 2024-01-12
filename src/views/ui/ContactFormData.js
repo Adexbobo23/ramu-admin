@@ -1,45 +1,47 @@
-import React, { useState } from "react";
-import {
-  Table,
-  Modal,
-  ModalBody,
-  Button,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-} from "reactstrap";
-import "../ComStyle/ContactFormData.scss"; 
-
-const demoFormData = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    id: 2,
-    name: "Jane Doe",
-    email: "jane.doe@example.com",
-    message: "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
-  },
-  // Add more demo data as needed
-];
+import React, { useState, useEffect } from "react";
+import { Table, Modal, ModalBody } from "reactstrap";
+import axios from "axios";
+import "../ComStyle/ContactFormData.scss";
 
 const ContactFormData = () => {
-  const [formData, setFormData] = useState(demoFormData);
+  const [formData, setFormData] = useState([]);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchContactMessages = async () => {
+      try {
+        const adminToken = localStorage.getItem("adminAuthToken");
+
+        if (adminToken) {
+          const response = await axios.get(
+            "https://api-staging.ramufinance.com/api/v1/admin/contact-us-meesages",
+            {
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+            }
+          );
+
+          if (response.status === 200 && response.data.status) {
+            setFormData(response.data.data);
+          } else {
+            console.error("Error fetching contact messages:", response.data.message);
+          }
+        } else {
+          console.error("Admin token is missing.");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching contact messages:", error.message);
+      }
+    };
+
+    fetchContactMessages();
+  }, []);
+
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-  };
-
-  const handleReply = (entry) => {
-    setSelectedEntry(entry);
-    toggleModal();
   };
 
   const handleSendReply = () => {
@@ -57,7 +59,6 @@ const ContactFormData = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Message</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -66,9 +67,6 @@ const ContactFormData = () => {
               <td>{entry.name}</td>
               <td>{entry.email}</td>
               <td>{entry.message}</td>
-              <td>
-                <Button onClick={() => handleReply(entry)}>Reply</Button>
-              </td>
             </tr>
           ))}
         </tbody>
@@ -78,21 +76,20 @@ const ContactFormData = () => {
       <Modal isOpen={isModalOpen} toggle={toggleModal}>
         <ModalBody>
           <h5>Reply to {selectedEntry?.name}</h5>
-          <Form>
-            <FormGroup>
-              <Label for="replyMessage">Your Reply</Label>
-              <Input
-                type="textarea"
-                name="replyMessage"
+          <form>
+            <div className="form-group">
+              <label htmlFor="replyMessage">Your Reply</label>
+              <textarea
+                className="form-control"
                 id="replyMessage"
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
               />
-            </FormGroup>
-            <Button color="primary" onClick={handleSendReply}>
+            </div>
+            <button className="btn btn-primary" onClick={handleSendReply}>
               Send Reply
-            </Button>
-          </Form>
+            </button>
+          </form>
         </ModalBody>
       </Modal>
     </div>

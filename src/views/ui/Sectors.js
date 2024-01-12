@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 import "../ComStyle/Sectors.scss";
+
+// Add formatDate function here
+const formatDate = (dateString) => {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+};
 
 const Sectors = () => {
   const [sectors, setSectors] = useState([]);
@@ -63,10 +70,46 @@ const Sectors = () => {
     setEditModalVisible(false);
   };
 
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  const handleEditSector = async () => {
+    try {
+      const adminToken = localStorage.getItem("adminAuthToken");
+  
+      if (!adminToken) {
+        console.error("Admin token not available");
+        return;
+      }
+  
+      const { id, name, description } = selectedSector;
+  
+      const response = await axios.put(
+        `https://api-staging.ramufinance.com/api/v1/admin/edit-sector/${id}`,
+        {
+          name,
+          description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+  
+      if (response.data.status) {
+        console.log("Sector edited successfully:", response.data.message);
+        // You may want to update the sectors list after a successful edit
+        window.alert("Sector edited successfully!");
+      } else {
+        console.error("Error editing sector:", response.data.message);
+        window.alert(`Error editing sector: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error("An error occurred while editing sector:", error);
+      window.alert("An error occurred while editing sector. Please try again.");
+    } finally {
+      setEditModalVisible(false);
+    };
   };
+  
 
   return (
     <div className="sectors-container">
@@ -83,7 +126,7 @@ const Sectors = () => {
               <th>Logo</th>
               <th>Created At</th>
               <th>Updated At</th>
-              {/* <th>Actions</th> */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -95,10 +138,10 @@ const Sectors = () => {
                 <td>{sector.logo || "-"}</td>
                 <td>{formatDate(sector.created_at)}</td>
                 <td>{formatDate(sector.updated_at)}</td>
-                {/* <td>
+                <td>
                   <button onClick={() => handleView(sector.id)}>View</button>
                   <button onClick={() => handleEdit(sector.id)}>Edit</button>
-                </td> */}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -106,37 +149,68 @@ const Sectors = () => {
       )}
 
       {/* View Modal */}
-      {selectedSector && viewModalVisible && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={handleCloseViewModal}>
-              &times;
-            </span>
-            <h2>View Sector</h2>
-            <p>ID: {selectedSector.id}</p>
-            <p>Name: {selectedSector.name}</p>
-            <p>Description: {selectedSector.description || "-"}</p>
-            {/* Add more details as needed */}
-          </div>
-        </div>
-      )}
+      <Modal isOpen={viewModalVisible} toggle={handleCloseViewModal}>
+        <ModalHeader toggle={handleCloseViewModal}>View Sector</ModalHeader>
+        <ModalBody>
+          {selectedSector && (
+            <>
+              <p>ID: {selectedSector.id}</p>
+              <p>Name: {selectedSector.name}</p>
+              <p>Description: {selectedSector.description || "-"}</p>
+              {/* Add more details as needed */}
+            </>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={handleCloseViewModal}>
+            Close
+          </Button>
+        </ModalFooter>
+      </Modal>
 
       {/* Edit Modal */}
-      {selectedSector && editModalVisible && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={handleCloseEditModal}>
-              &times;
-            </span>
-            <h2>Edit Sector</h2>
-            {/* Add form fields for editing sector details */}
-            <p>ID: {selectedSector.id}</p>
-            <p>Name: {selectedSector.name}</p>
-            <p>Description: {selectedSector.description || "-"}</p>
-            {/* Add more form fields as needed */}
-          </div>
-        </div>
-      )}
+      <Modal isOpen={editModalVisible} toggle={handleCloseEditModal}>
+        <ModalHeader toggle={handleCloseEditModal}>Edit Sector</ModalHeader>
+        <ModalBody>
+          {selectedSector && (
+            <>
+              <label htmlFor="editName">Name:</label>
+              <input
+                type="text"
+                id="editName"
+                value={selectedSector.name}
+                onChange={(e) =>
+                  setSelectedSector({
+                    ...selectedSector,
+                    name: e.target.value,
+                  })
+                }
+              />
+              <label htmlFor="editDescription">Description:</label>
+              <br ></br>
+              <br ></br>
+              <textarea
+                id="editDescription"
+                value={selectedSector.description || ""}
+                onChange={(e) =>
+                  setSelectedSector({
+                    ...selectedSector,
+                    description: e.target.value,
+                  })
+                }
+              ></textarea>
+            </>
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handleEditSector}>
+            Save Changes
+          </Button>{" "}
+          <Button color="secondary" onClick={handleCloseEditModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };

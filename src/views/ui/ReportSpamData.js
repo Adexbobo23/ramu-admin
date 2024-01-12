@@ -1,30 +1,44 @@
-import React, { useState } from "react";
-import {
-  Table,
-  Modal,
-  ModalBody,
-  Button,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-} from "reactstrap";
-import "../ComStyle/ReportSpamData.scss"; 
-
-const demoSpamData = [
-  {
-    id: 1,
-    email: "sibe@ramufinance.com",
-    description: "My account got compromised help",
-  },
-  // Add more demo data as needed
-];
+import React, { useState, useEffect } from "react";
+import { Table, Modal, ModalBody, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import axios from "axios";
+import "../ComStyle/ReportSpamData.scss";
 
 const ReportSpamData = () => {
-  const [spamData, setSpamData] = useState(demoSpamData);
+  const [spamData, setSpamData] = useState([]);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchSpamReports = async () => {
+      try {
+        const adminToken = localStorage.getItem("adminAuthToken");
+
+        if (adminToken) {
+          const response = await axios.get(
+            "https://api-staging.ramufinance.com/api/v1/admin/spam-reports",
+            {
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+              },
+            }
+          );
+
+          if (response.status === 200 && response.data.status) {
+            setSpamData(response.data.data);
+          } else {
+            console.error("Error fetching spam reports:", response.data.message);
+          }
+        } else {
+          console.error("Admin token is missing.");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching spam reports:", error.message);
+      }
+    };
+
+    fetchSpamReports();
+  }, []);
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -49,7 +63,6 @@ const ReportSpamData = () => {
           <tr>
             <th>Email</th>
             <th>Description</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -57,9 +70,6 @@ const ReportSpamData = () => {
             <tr key={entry.id}>
               <td>{entry.email}</td>
               <td>{entry.description}</td>
-              <td>
-                <Button onClick={() => handleReply(entry)}>Reply</Button>
-              </td>
             </tr>
           ))}
         </tbody>

@@ -1,5 +1,6 @@
 {
   "name": "ramu-admin",
+  "homepage": "https://ramu.jexceltech.com.ng",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

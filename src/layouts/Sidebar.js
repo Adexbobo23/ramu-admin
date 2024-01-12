@@ -343,6 +343,18 @@ const Sidebar = () => {
             {/* Collapse component for the Stock Management dropdown */}
             <Collapse isOpen={stockDropdownOpen}>
               <Nav vertical className="pl-4">
+              <NavItem>
+                  <Link
+                    to="/all-gtnstocks"
+                    className={
+                      location.pathname === "/all-gtnstocks"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">GTN Stock List</span>
+                  </Link>
+                </NavItem>
               <NavItem className="sidenav-bg">
                 <Link
                   to="/stocks-listing"
@@ -356,6 +368,18 @@ const Sidebar = () => {
                   <span className="ms-3 d-inline-block">Stock List</span>
                 </Link>
               </NavItem>
+              <NavItem>
+                  <Link
+                    to="/add-sectors"
+                    className={
+                      location.pathname === "/add-sectors"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Add Sectors</span>
+                  </Link>
+                </NavItem>
               <NavItem className="sidenav-bg">
                 <Link
                   to="/all-sector"
