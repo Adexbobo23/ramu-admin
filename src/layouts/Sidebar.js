@@ -420,6 +420,21 @@ const Sidebar = () => {
               </Nav>
             </Collapse>
           </NavItem>
+          
+          <NavItem className="sidenav-bg">
+            <Link
+              to="/transaction-details"
+              className={
+                location.pathname === "/transaction-details"
+                  ? "active nav-link py-3"
+                  : "nav-link py-3"
+              }
+            >
+              <i className="bi bi-file-earmark-text"></i>
+              <span className="ms-3 d-inline-block">Transaction Details</span>
+            </Link>
+          </NavItem>
+
           {/* Help and Support Dropdown */}
           <NavItem className="sidenav-bg">
             <Link
@@ -467,20 +482,6 @@ const Sidebar = () => {
                 </NavItem>
               </Nav>
             </Collapse>
-          </NavItem>
-
-          <NavItem className="sidenav-bg">
-            <Link
-              to="/transaction-details"
-              className={
-                location.pathname === "/transaction-details"
-                  ? "active nav-link py-3"
-                  : "nav-link py-3"
-              }
-            >
-              <i className="bi bi-file-earmark-text"></i>
-              <span className="ms-3 d-inline-block">Transaction Details</span>
-            </Link>
           </NavItem>
         </Nav>
       </div>

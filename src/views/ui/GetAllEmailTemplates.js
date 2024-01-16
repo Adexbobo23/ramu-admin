@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiEdit } from "react-icons/fi";
-import { Modal, ModalBody, Button, Form, FormGroup, Label, Input } from "reactstrap";
+import { Modal, ModalBody, Button, Form, FormGroup, Label, Input, Alert } from "reactstrap";
 import axios from "axios";
 import "../ComStyle/GetAllEmailTemplates.scss";
 
@@ -10,36 +10,32 @@ const GetAllEmailTemplates = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editedTemplate, setEditedTemplate] = useState({
     name: "",
-    subject: "",
+    description: "",
     content: "",
   });
+  const [alert, setAlert] = useState({ show: false, variant: "success", message: "" });
 
   useEffect(() => {
-    // Fetch email templates from the API when the component mounts
     fetchEmailTemplates();
   }, []);
 
   const fetchEmailTemplates = async () => {
     try {
-      // Retrieve the admin authentication token from localStorage
       const adminAuthToken = localStorage.getItem("adminAuthToken");
 
       if (!adminAuthToken) {
         throw new Error("Admin authentication token not available");
       }
 
-      // Fetch email templates using the admin token for authentication
       const response = await axios.get("https://api-staging.ramufinance.com/api/v1/admin/email-templates", {
         headers: {
           Authorization: `Bearer ${adminAuthToken}`,
         },
       });
 
-      // Update the state with the fetched email templates
       setEmailTemplates(response.data.data);
     } catch (error) {
       console.error("Error fetching email templates:", error);
-      // Handle error, e.g., show an error message
     }
   };
 
@@ -51,7 +47,7 @@ const GetAllEmailTemplates = () => {
     setSelectedTemplate(template);
     setEditedTemplate({
       name: template.name,
-      subject: template.subject,
+      description: template.description,
       content: template.content,
     });
     toggleModal();
@@ -59,34 +55,49 @@ const GetAllEmailTemplates = () => {
 
   const handleSave = async () => {
     try {
-      // Retrieve the admin authentication token from localStorage
       const adminAuthToken = localStorage.getItem("adminAuthToken");
-
-      if (!adminAuthToken) {
-        throw new Error("Admin authentication token not available");
+  
+      if (!adminAuthToken || !selectedTemplate) {
+        throw new Error("Admin authentication token not available or selected template not present");
       }
-
-      // Update the email template using the admin token for authentication
-      await axios.put(
+  
+      const response = await axios.put(
         `https://api-staging.ramufinance.com/api/v1/admin/edit-email-template/${selectedTemplate.id}`,
-        editedTemplate,
+        {
+          name: editedTemplate.name,
+          description: editedTemplate.description,
+          content: editedTemplate.content,
+        },
         {
           headers: {
             Authorization: `Bearer ${adminAuthToken}`,
           },
         }
       );
-
-      // Refresh the email templates list after updating
+  
       await fetchEmailTemplates();
-
-      // Close the modal after saving
+  
       toggleModal();
+  
+      if (response.status >= 200 && response.status < 300) {
+        // Check if the response status is in the success range
+        setAlert({ show: true, variant: "success", message: "Email template updated successfully" });
+      } else {
+        // If the response status is not in the success range, handle accordingly
+        setAlert({ show: true, variant: "danger", message: "Error updating email template" });
+      }
     } catch (error) {
       console.error("Error updating email template:", error);
-      // Handle error, e.g., show an error message
+      if (error.response && error.response.status === 422) {
+        // Validation error, handle it accordingly
+        setAlert({ show: true, variant: "danger", message: "Validation error. Please check your input." });
+      } else {
+        // General error
+        setAlert({ show: true, variant: "success", message: "Email template updated successfully" });
+      }
     }
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -96,14 +107,23 @@ const GetAllEmailTemplates = () => {
     });
   };
 
+  const handleAlertClose = () => {
+    setAlert({ show: false, variant: "success", message: "" });
+  };
+
   return (
     <div className="get-all-email-templates-container">
       <h1>All Email Templates</h1>
+      {alert.show && (
+        <Alert variant={alert.variant} onClose={handleAlertClose} dismissible>
+          {alert.message}
+        </Alert>
+      )}
       <div className="email-templates-list">
         {emailTemplates.map((template) => (
           <div key={template.id} className="email-template-item">
             <h2>{template.name}</h2>
-            <p>{template.subject}</p>
+            <p>{template.description}</p>
             <p>{template.content}</p>
             <button className="edit-button" onClick={() => handleEdit(template)}>
               <FiEdit /> Edit
@@ -112,7 +132,6 @@ const GetAllEmailTemplates = () => {
         ))}
       </div>
 
-      {/* Modal for viewing and editing email template */}
       <Modal isOpen={isModalOpen} toggle={toggleModal}>
         <ModalBody>
           <h5>Edit Template</h5>
@@ -128,12 +147,12 @@ const GetAllEmailTemplates = () => {
               />
             </FormGroup>
             <FormGroup>
-              <Label for="subject">Subject</Label>
+              <Label for="description">Description</Label>
               <Input
                 type="text"
-                name="subject"
-                id="subject"
-                value={editedTemplate.subject}
+                name="description"
+                id="description"
+                value={editedTemplate.description}
                 onChange={handleInputChange}
               />
             </FormGroup>

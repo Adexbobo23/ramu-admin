@@ -5,6 +5,8 @@ import '../ComStyle/SettlementAccountsTable.scss';
 
 const SettlementAccountsTable = () => {
   const [settlementAccounts, setSettlementAccounts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [accountsPerPage] = useState(10); // Number of accounts to display per page
 
   useEffect(() => {
     // Fetch adminAuthToken from local storage
@@ -31,6 +33,11 @@ const SettlementAccountsTable = () => {
       });
   }, []);
 
+  // Get current accounts for the current page
+  const indexOfLastAccount = currentPage * accountsPerPage;
+  const indexOfFirstAccount = indexOfLastAccount - accountsPerPage;
+  const currentAccounts = settlementAccounts.slice(indexOfFirstAccount, indexOfLastAccount);
+
   // Define handleEdit function
   const handleEdit = (accountId) => {
     // Logic for handling the Edit action
@@ -55,45 +62,61 @@ const SettlementAccountsTable = () => {
     console.log(`Delete action for account ID ${accountId}`);
   };
 
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="container">
-    <Table striped className="settlement-accounts-table">
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Bank Code</th>
-          <th>Bank Name</th>
-          <th>Account Number</th>
-          <th>Account Name</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {settlementAccounts.map((account) => (
-          <tr key={account.id}>
-            <td>{account.user.email}</td>
-            <td>{account.bank_code}</td>
-            <td>{account.beneficiary_bank_name}</td>
-            <td>{account.account_number}</td>
-            <td>{account.beneficiary_account_name}</td>
-            <td>
-              <Button color="info" onClick={() => handleEdit(account.id)}>
-                Edit
-              </Button>{" "}
-              <Button color="success" onClick={() => handleApprove(account.id)}>
-                Approve
-              </Button>{" "}
-              <Button color="danger" onClick={() => handleDecline(account.id)}>
-                Decline
-              </Button>{" "}
-              <Button color="danger" onClick={() => handleDelete(account.id)}>
-                Delete Settlement
-              </Button>
-            </td>
+      <Table striped className="settlement-accounts-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Bank Code</th>
+            <th>Bank Name</th>
+            <th>Account Number</th>
+            <th>Account Name</th>
+            <th>Action</th>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {currentAccounts.map((account) => (
+            <tr key={account.id}>
+              <td>{account.user.email}</td>
+              <td>{account.bank_code}</td>
+              <td>{account.beneficiary_bank_name}</td>
+              <td>{account.account_number}</td>
+              <td>{account.beneficiary_account_name}</td>
+              <td>
+                <Button color="info" onClick={() => handleEdit(account.id)}>
+                  Edit
+                </Button>{" "}
+                <Button color="success" onClick={() => handleApprove(account.id)}>
+                  Approve
+                </Button>{" "}
+                <Button color="danger" onClick={() => handleDecline(account.id)}>
+                  Decline
+                </Button>{" "}
+                <Button color="danger" onClick={() => handleDelete(account.id)}>
+                  Delete Settlement
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      {/* Pagination */}
+      <nav>
+        <ul className="pagination">
+          {Array.from({ length: Math.ceil(settlementAccounts.length / accountsPerPage) }).map((_, index) => (
+            <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+              <a onClick={() => paginate(index + 1)} className="page-link" href="#">
+                {index + 1}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 };

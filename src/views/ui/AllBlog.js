@@ -145,8 +145,8 @@ const AllBlog = () => {
             <p>{blog.thumbnail_image}</p>
             <p>
               {expandedBlogs.includes(blog.id)
-                ? blog.body // Show full body when expanded
-                : blog.body.slice(0, 500) + (blog.body.length > 500 ? "..." : "")}
+                ? blog.body 
+                : blog.body.slice(0, 100) + (blog.body.length > 100 ? "..." : "")}
             </p>
             <p>{blog.created_at}</p>
             <div className="blog-actions">
