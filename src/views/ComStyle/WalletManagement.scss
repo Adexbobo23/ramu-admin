@@ -56,9 +56,9 @@
   button {
     padding: 8px 16px;
     margin: 0 5px;
-    background-color: #007bff;
+    background-color: #51CC62;
     color: #fff;
-    border: 1px solid #007bff;
+    border: 1px solid #51CC62;
     cursor: pointer;
 
     &:disabled {
@@ -69,8 +69,8 @@
     }
 
     &:hover:enabled {
-      background-color: #0056b3;
-      border: 1px solid #0056b3;
+      background-color: #0bd626;
+      border: 1px solid #0bd626;
     }
   }
 

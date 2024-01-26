@@ -19,6 +19,8 @@ const StockListing = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [filteredStockListings, setFilteredStockListings] = useState([]);
+  const [logoFile, setLogoFile] = useState(null);
+  const [formData, setFormData] = useState(new FormData());
 
   useEffect(() => {
     // Retrieve the authentication token from localStorage
@@ -63,6 +65,12 @@ const StockListing = () => {
     setShowEditModal(true);
   };
 
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    setLogoFile(file);
+    setEditFormData({ ...editFormData, logo: file.name });
+  };
+
   const handleDetailsClick = (stock) => {
     setSelectedStock(stock);
     setShowDetailsModal(true);
@@ -77,57 +85,63 @@ const StockListing = () => {
   };
 
   const handleEditSubmit = () => {
-    // Check if selectedStock and selectedStock.id are defined
-    if (selectedStock && selectedStock.id) {
-      // Check if required fields are filled in
-      if (editFormData.company_name && editFormData.ticker_id && editFormData.exchange_code) {
-        // Retrieve the authentication token from localStorage
-        const adminAuthToken = localStorage.getItem("adminAuthToken");
-
-        // Check if the authentication token is available
-        if (adminAuthToken) {
-          // Fetch stock listings from the backend API using the admin token for authentication
-          axios
-            .put(
-              `https://api-staging.ramufinance.com/api/v1/admin/stocks/edit-stock-company/${selectedStock.id}`,
-              editFormData,
-              {
-                headers: {
-                  Authorization: `Bearer ${adminAuthToken}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            )
-            .then((response) => {
-              // Handle the response, e.g., show a success message
-              console.log("Stock edited successfully:", response.data);
-              setShowEditModal(false);
-              // Display a success alert
-              alert("Stock edited successfully!");
-            })
-            .catch((error) => {
-              console.error("Error editing stock:", error);
-              // Display an error alert
-              alert("Error editing stock. Please try again.");
+    const requiredFields = ['key', 'ticker_id', 'exchange_code', 'company_name', 'display_name', 'description'];
+    const missingField = requiredFields.find((field) => !editFormData[field]);
+  
+    if (missingField) {
+      alert(`Please fill in the required field: ${missingField}`);
+      return;
+    }
+  
+    // Append values from editFormData to formData
+    Object.entries(editFormData).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+  
+    const adminAuthToken = localStorage.getItem("adminAuthToken");
+  
+    if (adminAuthToken) {
+      axios
+        .put(
+          `https://api-staging.ramufinance.com/api/v1/admin/stocks/edit-stock-company/${selectedStock.id}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${adminAuthToken}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+        .then((response) => {
+          console.log("Stock edited successfully:", response.data);
+          setShowEditModal(false);
+          alert("Stock edited successfully!");
+        })
+        .catch((error) => {
+          console.error("Error editing stock:", error.response);
+  
+          if (error.response && error.response.data && error.response.data.message) {
+            const errorMessages = error.response.data.message;
+  
+            // Display specific error messages for each field
+            let errorMessageText = "Error editing stock:";
+            Object.keys(errorMessages).forEach((field) => {
+              const errorMessage = errorMessages[field][0];
+              errorMessageText += `\n${field}: ${errorMessage}`;
             });
-        } else {
-          // Handle case where authentication token is not available
-          console.error("Authentication token is missing.");
-          // Display an error alert
-          alert("Authentication token is missing.");
-        }
-      } else {
-        // Display an error alert if required fields are not filled in
-        alert("Please fill in all required fields.");
-      }
+            alert(errorMessageText);
+          } else {
+            alert("Error editing stock. Please try again.");
+          }
+        });
     } else {
-      // Handle case where selectedStock or selectedStock.id is not defined
-      console.error("Selected stock or stock ID is missing.");
-      // Display an error alert
-      alert("Selected stock or stock ID is missing.");
+      console.error("Authentication token is missing.");
+      alert("Authentication token is missing.");
     }
   };
-
+  
+  
+  
   const handleSearchInputChange = (e) => {
     const input = e.target.value.toLowerCase();
     setSearchInput(input);
@@ -158,6 +172,7 @@ const StockListing = () => {
         <thead>
           <tr>
             <th>ID</th>
+            <th>Logo</th>
             <th>Company Name</th>
             <th>Ticker ID</th>
             <th>Exchange Code</th>
@@ -169,6 +184,11 @@ const StockListing = () => {
           {filteredStockListings.map((stock) => (
             <tr key={stock.id}>
               <td>{stock.id}</td>
+              <td>
+                {stock.logo && (
+                  <img src={stock.logo} alt={`${stock.company_name} Logo`} style={{ width: '50px', height: '50px' }} />
+                )}
+              </td>
               <td>{stock.company_name}</td>
               <td>{stock.ticker_id}</td>
               <td>{stock.exchange_code}</td>
@@ -229,6 +249,10 @@ const StockListing = () => {
                 value={editFormData.description}
                 onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
               />
+            </Form.Group>
+            <Form.Group controlId="formLogo">
+              <Form.Label>Logo</Form.Label>
+              <Form.Control type="file" onChange={handleLogoChange} />
             </Form.Group>
           </Form>
         </Modal.Body>

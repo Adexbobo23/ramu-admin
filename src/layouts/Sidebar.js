@@ -180,7 +180,7 @@ const Sidebar = () => {
                     <span className="ms-3 d-inline-block">Get All Email Templates</span>
                   </Link>
                 </NavItem>
-                <NavItem>
+                {/* <NavItem>
                   <Link
                     to="/create-email-template"
                     className={
@@ -191,10 +191,25 @@ const Sidebar = () => {
                   >
                     <span className="ms-3 d-inline-block">Create Email Template</span>
                   </Link>
-                </NavItem>
+                </NavItem> */}
               </Nav>
             </Collapse>
           </NavItem>
+
+          <NavItem className="sidenav-bg">
+            <Link
+              to="/exchange-rate"
+              className={
+                location.pathname === "/exchange-rate"
+                  ? "active nav-link py-3"
+                  : "nav-link py-3"
+              }
+            >
+              <i className="bi bi-person-badge"></i>
+              <span className="ms-3 d-inline-block">Exchange Rate</span>
+            </Link>
+          </NavItem>
+
           
           <NavItem className="sidenav-bg">
             <Link

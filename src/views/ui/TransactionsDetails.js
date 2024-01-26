@@ -160,14 +160,23 @@ const TransactionDetails = ({ transactionId }) => {
       </Button>
 
       <Table>
-        <thead>
+      <thead>
           <tr>
+            <th>User Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
             <th>Wallet Address</th>
             <th>Transaction Type</th>
             <th>Amount</th>
             <th>Quantity</th>
             <th>Trade Price</th>
+            <th>Transaction Reference</th>
+            <th>Order Number</th>
             <th>Currency</th>
+            <th>Balance Before</th>
+            <th>Balance After</th>
+            <th>Quantity Before</th>
+            <th>Quantity After</th>
             <th>Status</th>
             <th>Date</th>
           </tr>
@@ -175,12 +184,21 @@ const TransactionDetails = ({ transactionId }) => {
         <tbody>
           {currentTransactions.map((transactionItem) => (
             <tr key={transactionItem.id} onClick={openModal}>
+              <td>{transactionItem.user.user_name}</td>
+              <td>{transactionItem.user.email}</td>
+              <td>{transactionItem.user.phone_number}</td>
               <td>{transactionItem.wallet_address}</td>
               <td>{transactionItem.txn_type}</td>
               <td>{transactionItem.amount}</td>
               <td>{transactionItem.quantity}</td>
               <td>{transactionItem.trade_price}</td>
+              <td>{transactionItem.transaction_reference}</td>
+              <td>{transactionItem.order_number}</td>
               <td>{transactionItem.currency}</td>
+              <td>{transactionItem.balance_before}</td>
+              <td>{transactionItem.balance_after}</td>
+              <td>{transactionItem.quantity_before}</td>
+              <td>{transactionItem.quantity_after}</td>
               <td>{transactionItem.status}</td>
               <td>{transactionItem.created_at}</td>
             </tr>

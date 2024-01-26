@@ -90,6 +90,32 @@ const AllBlog = () => {
     }
   };
 
+  const handleDeleteBlog = async (blogId) => {
+    const adminToken = localStorage.getItem("adminAuthToken");
+
+    try {
+      const response = await axios.delete(
+        `https://api-staging.ramufinance.com/api/v1/admin/delete-blog-post/${blogId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      if (response.data.status) {
+        alert("Blog post deleted successfully");
+        // Refresh the blog list
+        fetchBlogPosts();
+      } else {
+        alert("Error deleting blog post");
+      }
+    } catch (error) {
+      console.error("An error occurred while deleting blog post:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
+
   const fetchBlogPosts = async () => {
     try {
       const adminToken = localStorage.getItem("adminAuthToken");
@@ -142,7 +168,13 @@ const AllBlog = () => {
         {currentBlogs.map((blog) => (
           <div key={blog.id} className="blog-item">
             <h2 className="title">{blog.title}</h2>
-            <p>{blog.thumbnail_image}</p>
+            {blog.thumbnail_image && (
+              <img
+                src={blog.thumbnail_image}
+                alt={`Thumbnail for ${blog.title}`}
+                className="thumbnail-image"
+              />
+            )}
             <p>
               {expandedBlogs.includes(blog.id)
                 ? blog.body 
@@ -155,6 +187,9 @@ const AllBlog = () => {
               </Button>{" "}
               <Button color="info" onClick={() => openEditModal(blog)}>
                 Edit
+              </Button>
+              <Button color="danger" onClick={() => handleDeleteBlog(blog.id)}>
+                Delete
               </Button>
             </div>
           </div>

@@ -3,15 +3,13 @@ import axios from "axios";
 import "../ComStyle/AddStock.scss";
 
 const AddStock = () => {
-  const [stockName, setStockName] = useState("");
-  const [stockPrice, setStockPrice] = useState("");
   const [exchangeCode, setExchangeCode] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
   const [sectorOptions, setSectorOptions] = useState([]);
   const [selectedSector, setSelectedSector] = useState("");
-  const [logo, setLogo] = useState(null); // Change to null as it will hold a file
+  const [logo, setLogo] = useState(null);
 
   useEffect(() => {
     const fetchSectors = async () => {
@@ -56,14 +54,14 @@ const AddStock = () => {
       }
 
       const formData = new FormData();
-      formData.append("key", "");
-      formData.append("ticker_id", ""); 
+      formData.append("key", `${exchangeCode}~${companyName}`);
+      formData.append("ticker_id", companyName);
       formData.append("exchange_code", exchangeCode);
       formData.append("company_name", companyName);
       formData.append("display_name", displayName);
       formData.append("description", description);
-      formData.append("sector", selectedSector);
-      formData.append("logo", logo); 
+      formData.append("market_sector_id", selectedSector);
+      formData.append("logo", logo);
 
       const response = await axios.post(
         "https://api-staging.ramufinance.com/api/v1/admin/stocks/add-stock-company",
@@ -71,7 +69,7 @@ const AddStock = () => {
         {
           headers: {
             Authorization: `Bearer ${adminToken}`,
-            "Content-Type": "multipart/form-data", 
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -80,8 +78,6 @@ const AddStock = () => {
         console.log("Stock added successfully");
         // Optionally, you can handle success scenarios here
         // Reset the form fields after adding the stock
-        setStockName("");
-        setStockPrice("");
         setExchangeCode("");
         setCompanyName("");
         setDisplayName("");
@@ -107,24 +103,6 @@ const AddStock = () => {
     <div className="add-stock">
       <h2>Add New Stock</h2>
       <form>
-        <div className="form-group">
-          <label htmlFor="stockName">Stock Name</label>
-          <input
-            type="text"
-            id="stockName"
-            value={stockName}
-            onChange={(e) => setStockName(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="stockPrice">Stock Price</label>
-          <input
-            type="number"
-            id="stockPrice"
-            value={stockPrice}
-            onChange={(e) => setStockPrice(e.target.value)}
-          />
-        </div>
         <div className="form-group">
           <label htmlFor="exchangeCode">Exchange Code</label>
           <input
@@ -172,7 +150,7 @@ const AddStock = () => {
               Select a Sector
             </option>
             {sectorOptions.map((sector) => (
-              <option key={sector.id} value={sector.name}>
+              <option key={sector.id} value={sector.id}>
                 {sector.name}
               </option>
             ))}
@@ -183,7 +161,7 @@ const AddStock = () => {
           <input
             type="file"
             id="logo"
-            accept="image/*" 
+            accept="image/*"
             onChange={handleLogoChange}
           />
         </div>

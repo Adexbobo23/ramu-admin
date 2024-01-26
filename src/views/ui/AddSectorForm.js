@@ -6,6 +6,7 @@ import '../ComStyle/AddSectorForm.scss';
 const AddSectorForm = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [logo, setLogo] = useState(null); // Add logo state
   const [alertMessage, setAlertMessage] = useState("");
   const [alertColor, setAlertColor] = useState("");
 
@@ -20,15 +21,18 @@ const AddSectorForm = () => {
     }
 
     // Prepare the sector data
-    const sectorData = {
-      name,
-      description,
-    };
+    const sectorData = new FormData();
+    sectorData.append("name", name);
+    sectorData.append("description", description);
+    if (logo) {
+      sectorData.append("logo", logo, logo.name);
+    }
 
     // Send a POST request to add a market sector
     axios.post("https://api-staging.ramufinance.com/api/v1/admin/add-market-sector", sectorData, {
       headers: {
         Authorization: `Bearer ${adminAuthToken}`,
+        "Content-Type": "multipart/form-data",
       },
     })
       .then(response => {
@@ -42,6 +46,11 @@ const AddSectorForm = () => {
         setAlertMessage("Error adding market sector. Please try again.");
         setAlertColor("danger");
       });
+  };
+
+  const handleLogoChange = (e) => {
+    // Update the logo state when a file is selected
+    setLogo(e.target.files[0]);
   };
 
   return (
@@ -67,6 +76,14 @@ const AddSectorForm = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter sector description"
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label for="logo">Logo</Label>
+          <Input
+            type="file"
+            id="logo"
+            onChange={handleLogoChange}
           />
         </FormGroup>
         <Button color="success" onClick={handleAddSector}>

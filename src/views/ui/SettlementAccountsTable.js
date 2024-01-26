@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button } from "reactstrap";
+import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, Label, FormGroup } from "reactstrap";
 import axios from "axios";
 import '../ComStyle/SettlementAccountsTable.scss';
 
 const SettlementAccountsTable = () => {
   const [settlementAccounts, setSettlementAccounts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [accountsPerPage] = useState(10); // Number of accounts to display per page
+  const [accountsPerPage] = useState(10); 
+  const [modal, setModal] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  const [editedAccount, setEditedAccount] = useState({
+    user: {
+      email: '',
+    },
+    bank_code: '',
+    beneficiary_bank_name: '',
+    account_number: '',
+    beneficiary_account_name: '',
+  });
+  
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     // Fetch adminAuthToken from local storage
@@ -33,40 +46,115 @@ const SettlementAccountsTable = () => {
       });
   }, []);
 
-  // Get current accounts for the current page
+  const toggleModal = () => {
+    setModal(!modal);
+  };
+
+  const viewDetails = (account) => {
+    setSelectedAccount(account);
+    toggleModal();
+  };
+
+  const handleEdit = (account) => {
+    setSelectedAccount(account);
+    setEditedAccount({ ...account });
+    toggleModal();
+  };
+
+  const handleSave = () => {
+    // Fetch adminAuthToken from local storage
+    const adminAuthToken = localStorage.getItem("adminAuthToken");
+
+    // Check if adminAuthToken is available
+    if (!adminAuthToken) {
+      console.error("Admin authentication token not found in local storage.");
+      // Handle the case where the token is not available (e.g., redirect to login)
+      return;
+    }
+
+    // Add axios request to update the account details on the server with admin authentication headers
+    axios.put(`https://api-staging.ramufinance.com/api/v1/admin/edit-settlement-account/${selectedAccount.id}`, editedAccount, {
+      headers: {
+        Authorization: `Bearer ${adminAuthToken}`,
+      },
+    })
+      .then(response => {
+        // Handle success
+        console.log("Edit successful:", response.data);
+        setSuccessMessage("Account edited successfully!");
+        // Add logic to update the local state with the edited account details
+        // ...
+
+        // Alert message
+        window.alert("Account edited successfully!");
+      })
+      .catch(error => {
+        // Handle error
+        console.error("Error editing account:", error);
+        // You may want to set an error message state for display
+        // ...
+      });
+
+    toggleModal(); // Close the modal after saving
+  };
+
+  const handleDelete = (accountId) => {
+    // Fetch adminAuthToken from local storage
+    const adminAuthToken = localStorage.getItem("adminAuthToken");
+
+    // Check if adminAuthToken is available
+    if (!adminAuthToken) {
+      console.error("Admin authentication token not found in local storage.");
+      // Handle the case where the token is not available (e.g., redirect to login)
+      return;
+    }
+
+    // Add axios request to delete the account with admin authentication headers
+    axios.delete(`https://api-staging.ramufinance.com/api/v1/admin/delete-settlement-account/${accountId}`, {
+      headers: {
+        Authorization: `Bearer ${adminAuthToken}`,
+      },
+    })
+      .then(response => {
+        // Handle success
+        console.log("Delete successful:", response.data);
+        setSuccessMessage("Account deleted successfully!");
+        // Add logic to update the local state after deletion
+        // ...
+
+        // Alert message
+        window.alert("Account deleted successfully!");
+      })
+      .catch(error => {
+        // Handle error
+        console.error("Error deleting account:", error);
+        // You may want to set an error message state for display
+        // ...
+      });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedAccount({
+      ...editedAccount,
+      [name]: value,
+    });
+  };
+
   const indexOfLastAccount = currentPage * accountsPerPage;
   const indexOfFirstAccount = indexOfLastAccount - accountsPerPage;
   const currentAccounts = settlementAccounts.slice(indexOfFirstAccount, indexOfLastAccount);
 
-  // Define handleEdit function
-  const handleEdit = (accountId) => {
-    // Logic for handling the Edit action
-    console.log(`Edit action for account ID ${accountId}`);
-  };
-
-  // Define handleApprove function
-  const handleApprove = (accountId) => {
-    // Logic for handling the Approve action
-    console.log(`Approve action for account ID ${accountId}`);
-  };
-
-  // Define handleDecline function
-  const handleDecline = (accountId) => {
-    // Logic for handling the Decline action
-    console.log(`Decline action for account ID ${accountId}`);
-  };
-
-  // Define handleDelete function
-  const handleDelete = (accountId) => {
-    // Logic for handling the Delete action
-    console.log(`Delete action for account ID ${accountId}`);
-  };
-
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="container">
+       {/* Success Message Alert */}
+       {successMessage && (
+        <div className="alert alert-success" role="alert">
+          {successMessage}
+        </div>
+      )}
       <Table striped className="settlement-accounts-table">
         <thead>
           <tr>
@@ -87,17 +175,14 @@ const SettlementAccountsTable = () => {
               <td>{account.account_number}</td>
               <td>{account.beneficiary_account_name}</td>
               <td>
-                <Button color="info" onClick={() => handleEdit(account.id)}>
+                <Button color="info" onClick={() => handleEdit(account)}>
                   Edit
                 </Button>{" "}
-                <Button color="success" onClick={() => handleApprove(account.id)}>
-                  Approve
-                </Button>{" "}
-                <Button color="danger" onClick={() => handleDecline(account.id)}>
-                  Decline
+                <Button color="success" onClick={() => viewDetails(account)}>
+                  View
                 </Button>{" "}
                 <Button color="danger" onClick={() => handleDelete(account.id)}>
-                  Delete Settlement
+                  Delete
                 </Button>
               </td>
             </tr>
@@ -117,6 +202,43 @@ const SettlementAccountsTable = () => {
           ))}
         </ul>
       </nav>
+
+      {/* Edit Account Modal */}
+      <Modal isOpen={modal} toggle={toggleModal}>
+        <ModalHeader toggle={toggleModal}>Edit Account</ModalHeader>
+        <ModalBody>
+  <FormGroup>
+    {/* Remove readOnly attribute */}
+    <Label for="email">Email</Label>
+    <Input type="text" name="email" id="email" value={editedAccount.user?.email || ''} />
+  </FormGroup>
+  <FormGroup>
+    <Label for="bankCode">Bank Code</Label>
+    <Input type="text" name="bankCode" id="bankCode" value={editedAccount.bank_code || ''} onChange={handleInputChange} />
+  </FormGroup>
+  <FormGroup>
+    <Label for="bankName">Bank Name</Label>
+    <Input type="text" name="bankName" id="bankName" value={editedAccount.beneficiary_bank_name || ''} onChange={handleInputChange} />
+  </FormGroup>
+  <FormGroup>
+    <Label for="accountNumber">Account Number</Label>
+    <Input type="text" name="accountNumber" id="accountNumber" value={editedAccount.account_number || ''} onChange={handleInputChange} />
+  </FormGroup>
+  <FormGroup>
+    <Label for="accountName">Account Name</Label>
+    <Input type="text" name="accountName" id="accountName" value={editedAccount.beneficiary_account_name || ''} onChange={handleInputChange} />
+  </FormGroup>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button color="primary" onClick={handleSave}>
+            Save
+          </Button>{" "}
+          <Button color="secondary" onClick={toggleModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };

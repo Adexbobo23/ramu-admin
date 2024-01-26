@@ -40,6 +40,14 @@
         color: #666;
       }
 
+      .thumbnail-image {
+        max-width: 100%; 
+        height: auto; 
+        margin-bottom: 10px;
+        display: block;
+        height: 300px;
+      }
+
       .blog-actions {
         button {
           margin-right: 10px;

@@ -73,30 +73,34 @@ const Sectors = () => {
   const handleEditSector = async () => {
     try {
       const adminToken = localStorage.getItem("adminAuthToken");
-  
+
       if (!adminToken) {
         console.error("Admin token not available");
         return;
       }
-  
-      const { id, name, description } = selectedSector;
-  
+
+      const { id, name, description, logo } = selectedSector;
+
+      const sectorData = new FormData();
+      sectorData.append("name", name);
+      sectorData.append("description", description);
+      if (logo) {
+        sectorData.append("logo", logo, logo.name);
+      }
+
       const response = await axios.put(
         `https://api-staging.ramufinance.com/api/v1/admin/edit-sector/${id}`,
-        {
-          name,
-          description,
-        },
+        sectorData,
         {
           headers: {
             Authorization: `Bearer ${adminToken}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-  
+
       if (response.data.status) {
         console.log("Sector edited successfully:", response.data.message);
-        // You may want to update the sectors list after a successful edit
         window.alert("Sector edited successfully!");
       } else {
         console.error("Error editing sector:", response.data.message);
@@ -107,7 +111,14 @@ const Sectors = () => {
       window.alert("An error occurred while editing sector. Please try again.");
     } finally {
       setEditModalVisible(false);
-    };
+    }
+  };
+
+  const handleLogoChange = (e) => {
+    setSelectedSector({
+      ...selectedSector,
+      logo: e.target.files[0],
+    });
   };
   
 
@@ -187,8 +198,6 @@ const Sectors = () => {
                 }
               />
               <label htmlFor="editDescription">Description:</label>
-              <br ></br>
-              <br ></br>
               <textarea
                 id="editDescription"
                 value={selectedSector.description || ""}
@@ -199,6 +208,12 @@ const Sectors = () => {
                   })
                 }
               ></textarea>
+              <label htmlFor="editLogo">Logo:</label>
+              <input
+                type="file"
+                id="editLogo"
+                onChange={handleLogoChange}
+              />
             </>
           )}
         </ModalBody>
