@@ -96,17 +96,38 @@ const SalesChart = () => {
     fetchOrderData();
     fetchCustomerData();
     fetchWithdrawnData();
-  }, []); // Empty dependency array to trigger the API calls only once on component mount
+  }, []);
+
+  // Format number to K (thousands)
+  const formatNumberToK = (value) => {
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K`;
+    }
+    return value;
+  };
 
   const options = {
     chart: {
       type: "area",
       height: 279,
+      zoom: {
+        enabled: false,
+      },
     },
     xaxis: {
-      type: "datetime", // Set x-axis type to datetime
+      type: "datetime",
     },
-    // ... (other existing options)
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+    },
+    tooltip: {
+      x: {
+        format: "dd MMM yyyy",
+      },
+    },
   };
 
   const series = [
@@ -135,15 +156,15 @@ const SalesChart = () => {
           <Row>
             <Col md="4">
               <h6>Total Order</h6>
-              <h4 className="mb-0 fw-bold">${orderData.total_investment_value || 0}</h4>
+              <h4 className="mb-0 fw-bold">${formatNumberToK(orderData.total_investment_value || 0)}</h4>
             </Col>
             <Col md="4">
               <h6>Total Withdrawn</h6>
-              <h4 className="mb-0 fw-bold">₦{withdrawnData.amount || 0}</h4>
+              <h4 className="mb-0 fw-bold">₦{formatNumberToK(withdrawnData.amount || 0)}</h4>
             </Col>
             <Col md="4">
               <h6>All Users</h6>
-              <h4 className="mb-0 fw-bold">{customerData.user_count || 0}</h4>
+              <h4 className="mb-0 fw-bold">{formatNumberToK(customerData.user_count || 0)}</h4>
             </Col>
           </Row>
         </div>

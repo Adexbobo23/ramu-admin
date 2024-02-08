@@ -76,6 +76,7 @@ const AddStock = () => {
 
       if (response.status >= 200 && response.status < 300) {
         console.log("Stock added successfully");
+        alert('Stock Added Successfully')
         // Optionally, you can handle success scenarios here
         // Reset the form fields after adding the stock
         setExchangeCode("");
@@ -83,7 +84,7 @@ const AddStock = () => {
         setDisplayName("");
         setDescription("");
         setSelectedSector("");
-        setLogo(null); // Reset the file input
+        setLogo(null); 
       } else {
         console.error("Error adding stock:", response.data.message);
         alert(`Error adding stock: ${response.data.message}`);

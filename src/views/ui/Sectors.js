@@ -134,7 +134,7 @@ const Sectors = () => {
               <th>ID</th>
               <th>Name</th>
               <th>Description</th>
-              <th>Logo</th>
+              {/* <th>Logo</th> */}
               <th>Created At</th>
               <th>Updated At</th>
               <th>Actions</th>
@@ -146,7 +146,7 @@ const Sectors = () => {
                 <td>{sector.id}</td>
                 <td>{sector.name}</td>
                 <td>{sector.description || "-"}</td>
-                <td>{sector.logo || "-"}</td>
+                {/* <td>{sector.logo || "-"}</td> */}
                 <td>{formatDate(sector.created_at)}</td>
                 <td>{formatDate(sector.updated_at)}</td>
                 <td>

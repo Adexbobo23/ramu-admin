@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Modal, ModalHeader, ModalBody, Button, Form, FormGroup, Label, Input } from "reactstrap";
 import axios from "axios";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; 
-import "../ComStyle/AllBlog.scss";
+import "react-quill/dist/quill.snow.css";  
 import { MdCloudUpload } from "react-icons/md";
+import "../ComStyle/AllBlog.scss";
 
 const ITEMS_PER_PAGE = 3;
+
+const BlogContent = ({ content }) => {
+  return <div dangerouslySetInnerHTML={{ __html: content }} />;
+};
 
 const AllBlog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -175,11 +179,7 @@ const AllBlog = () => {
                 className="thumbnail-image"
               />
             )}
-            <p>
-              {expandedBlogs.includes(blog.id)
-                ? blog.body 
-                : blog.body.slice(0, 100) + (blog.body.length > 100 ? "..." : "")}
-            </p>
+            <BlogContent content={expandedBlogs.includes(blog.id) ? blog.body : blog.body.slice(0, 100) + (blog.body.length > 100 ? "..." : "")} />
             <p>{blog.created_at}</p>
             <div className="blog-actions">
               <Button color="success" onClick={() => openViewModal(blog)}>
@@ -214,7 +214,7 @@ const AllBlog = () => {
         <ModalHeader toggle={toggleViewModal}>View Blog</ModalHeader>
         <ModalBody>
           <h2>{selectedBlog?.title}</h2>
-          <p>{selectedBlog?.body}</p>
+          <BlogContent content={selectedBlog?.body} />
         </ModalBody>
       </Modal>
 

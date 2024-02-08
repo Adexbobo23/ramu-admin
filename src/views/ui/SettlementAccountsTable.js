@@ -6,7 +6,7 @@ import '../ComStyle/SettlementAccountsTable.scss';
 const SettlementAccountsTable = () => {
   const [settlementAccounts, setSettlementAccounts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [accountsPerPage] = useState(10); 
+  const [accountsPerPage] = useState(10);
   const [modal, setModal] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [editedAccount, setEditedAccount] = useState({
@@ -18,32 +18,27 @@ const SettlementAccountsTable = () => {
     account_number: '',
     beneficiary_account_name: '',
   });
-  
   const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
-    // Fetch adminAuthToken from local storage
-    const adminAuthToken = localStorage.getItem("adminAuthToken");
-
-    // Check if adminAuthToken is available
-    if (!adminAuthToken) {
-      console.error("Admin authentication token not found in local storage.");
-      return;
-    }
-
-    // Fetch settlement accounts data from the API with admin authentication headers
-    axios.get("https://api-staging.ramufinance.com/api/v1/admin/settlement-accounts", {
-      headers: {
-        Authorization: `Bearer ${adminAuthToken}`,
-      },
-    })
-      .then(response => {
-        const { data } = response.data;
-        setSettlementAccounts(data);
-      })
-      .catch(error => {
+    const fetchSettlementAccounts = async () => {
+      try {
+        const adminAuthToken = localStorage.getItem("adminAuthToken");
+        if (!adminAuthToken) {
+          console.error("Admin authentication token not found in local storage.");
+          return;
+        }
+        const response = await axios.get("https://api-staging.ramufinance.com/api/v1/admin/settlement-accounts", {
+          headers: {
+            Authorization: `Bearer ${adminAuthToken}`,
+          },
+        });
+        setSettlementAccounts(response.data.data);
+      } catch (error) {
         console.error("Error fetching settlement accounts:", error);
-      });
+      }
+    };
+    fetchSettlementAccounts();
   }, []);
 
   const toggleModal = () => {
@@ -62,74 +57,46 @@ const SettlementAccountsTable = () => {
   };
 
   const handleSave = () => {
-    // Fetch adminAuthToken from local storage
     const adminAuthToken = localStorage.getItem("adminAuthToken");
-
-    // Check if adminAuthToken is available
     if (!adminAuthToken) {
       console.error("Admin authentication token not found in local storage.");
-      // Handle the case where the token is not available (e.g., redirect to login)
       return;
     }
-
-    // Add axios request to update the account details on the server with admin authentication headers
     axios.put(`https://api-staging.ramufinance.com/api/v1/admin/edit-settlement-account/${selectedAccount.id}`, editedAccount, {
       headers: {
         Authorization: `Bearer ${adminAuthToken}`,
       },
     })
       .then(response => {
-        // Handle success
         console.log("Edit successful:", response.data);
         setSuccessMessage("Account edited successfully!");
-        // Add logic to update the local state with the edited account details
-        // ...
-
-        // Alert message
         window.alert("Account edited successfully!");
       })
       .catch(error => {
-        // Handle error
         console.error("Error editing account:", error);
-        // You may want to set an error message state for display
-        // ...
       });
-
-    toggleModal(); // Close the modal after saving
+    toggleModal();
   };
 
   const handleDelete = (accountId) => {
-    // Fetch adminAuthToken from local storage
     const adminAuthToken = localStorage.getItem("adminAuthToken");
-
-    // Check if adminAuthToken is available
     if (!adminAuthToken) {
       console.error("Admin authentication token not found in local storage.");
-      // Handle the case where the token is not available (e.g., redirect to login)
       return;
     }
-
-    // Add axios request to delete the account with admin authentication headers
     axios.delete(`https://api-staging.ramufinance.com/api/v1/admin/delete-settlement-account/${accountId}`, {
       headers: {
         Authorization: `Bearer ${adminAuthToken}`,
       },
     })
       .then(response => {
-        // Handle success
         console.log("Delete successful:", response.data);
         setSuccessMessage("Account deleted successfully!");
-        // Add logic to update the local state after deletion
-        // ...
-
-        // Alert message
+        // Handle local state update or refetch settlement accounts
         window.alert("Account deleted successfully!");
       })
       .catch(error => {
-        // Handle error
         console.error("Error deleting account:", error);
-        // You may want to set an error message state for display
-        // ...
       });
   };
 
@@ -141,16 +108,19 @@ const SettlementAccountsTable = () => {
     });
   };
 
+  const totalPages = Math.ceil(settlementAccounts.length / accountsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   const indexOfLastAccount = currentPage * accountsPerPage;
   const indexOfFirstAccount = indexOfLastAccount - accountsPerPage;
   const currentAccounts = settlementAccounts.slice(indexOfFirstAccount, indexOfLastAccount);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   return (
     <div className="container">
-       {/* Success Message Alert */}
-       {successMessage && (
+      {successMessage && (
         <div className="alert alert-success" role="alert">
           {successMessage}
         </div>
@@ -190,12 +160,11 @@ const SettlementAccountsTable = () => {
         </tbody>
       </Table>
 
-      {/* Pagination */}
       <nav>
         <ul className="pagination">
-          {Array.from({ length: Math.ceil(settlementAccounts.length / accountsPerPage) }).map((_, index) => (
+          {Array.from({ length: totalPages }).map((_, index) => (
             <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-              <a onClick={() => paginate(index + 1)} className="page-link" href="#">
+              <a className="page-link" onClick={() => paginate(index + 1)}>
                 {index + 1}
               </a>
             </li>
@@ -203,33 +172,30 @@ const SettlementAccountsTable = () => {
         </ul>
       </nav>
 
-      {/* Edit Account Modal */}
       <Modal isOpen={modal} toggle={toggleModal}>
         <ModalHeader toggle={toggleModal}>Edit Account</ModalHeader>
         <ModalBody>
-  <FormGroup>
-    {/* Remove readOnly attribute */}
-    <Label for="email">Email</Label>
-    <Input type="text" name="email" id="email" value={editedAccount.user?.email || ''} />
-  </FormGroup>
-  <FormGroup>
-    <Label for="bankCode">Bank Code</Label>
-    <Input type="text" name="bankCode" id="bankCode" value={editedAccount.bank_code || ''} onChange={handleInputChange} />
-  </FormGroup>
-  <FormGroup>
-    <Label for="bankName">Bank Name</Label>
-    <Input type="text" name="bankName" id="bankName" value={editedAccount.beneficiary_bank_name || ''} onChange={handleInputChange} />
-  </FormGroup>
-  <FormGroup>
-    <Label for="accountNumber">Account Number</Label>
-    <Input type="text" name="accountNumber" id="accountNumber" value={editedAccount.account_number || ''} onChange={handleInputChange} />
-  </FormGroup>
-  <FormGroup>
-    <Label for="accountName">Account Name</Label>
-    <Input type="text" name="accountName" id="accountName" value={editedAccount.beneficiary_account_name || ''} onChange={handleInputChange} />
-  </FormGroup>
+          <FormGroup>
+            <Label for="email">Email</Label>
+            <Input type="text" name="email" id="email" value={editedAccount.user?.email || ''} />
+          </FormGroup>
+          <FormGroup>
+            <Label for="bankCode">Bank Code</Label>
+            <Input type="text" name="bankCode" id="bankCode" value={editedAccount.bank_code || ''} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label for="bankName">Bank Name</Label>
+            <Input type="text" name="bankName" id="bankName" value={editedAccount.beneficiary_bank_name || ''} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label for="accountNumber">Account Number</Label>
+            <Input type="text" name="accountNumber" id="accountNumber" value={editedAccount.account_number || ''} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label for="accountName">Account Name</Label>
+            <Input type="text" name="accountName" id="accountName" value={editedAccount.beneficiary_account_name || ''} onChange={handleInputChange} />
+          </FormGroup>
         </ModalBody>
-
         <ModalFooter>
           <Button color="primary" onClick={handleSave}>
             Save

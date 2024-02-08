@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardBody,
@@ -8,47 +8,43 @@ import {
   ListGroupItem,
   Button,
 } from "reactstrap";
-
-const FeedData = [
-  {
-    title: "A new user just register",
-    icon: "bi bi-bell",
-    color: "primary",
-    date: "6 minutes ago",
-  },
-  {
-    title: "New user registered.",
-    icon: "bi bi-person",
-    color: "info",
-    date: "6 minutes ago",
-  },
-  {
-    title: "Server #1 overloaded.",
-    icon: "bi bi-hdd",
-    color: "danger",
-    date: "6 minutes ago",
-  },
-  {
-    title: "New order received.",
-    icon: "bi bi-bag-check",
-    color: "success",
-    date: "6 minutes ago",
-  },
-  {
-    title: "New Stock added",
-    icon: "bi bi-bell",
-    color: "dark",
-    date: "6 minutes ago",
-  },
-  {
-    title: "Server #1 overloaded.",
-    icon: "bi bi-hdd",
-    color: "warning",
-    date: "6 minutes ago",
-  },
-];
+import axios from "axios";
 
 const Feeds = () => {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const adminToken = localStorage.getItem("adminAuthToken");
+
+        if (!adminToken) {
+          console.error("Admin token not available");
+          return;
+        }
+
+        const response = await axios.get(
+          "https://api-staging.ramufinance.com/api/v1/admin/notifications",
+          {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setNotifications(response.data.data);
+        } else {
+          console.error("Error fetching notifications:", response.statusText);
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <Card>
       <CardBody>
@@ -59,9 +55,9 @@ const Feeds = () => {
         {/* Wrap ListGroup in a div with a specific height and overflow-y:auto */}
         <div style={{ maxHeight: "300px", overflowY: "auto" }}>
           <ListGroup flush className="mt-4">
-            {FeedData.map((feed, index) => (
+            {notifications.map((notification) => (
               <ListGroupItem
-                key={index}
+                key={notification.id}
                 action
                 href="/"
                 tag="a"
@@ -70,13 +66,13 @@ const Feeds = () => {
                 <Button
                   className="rounded-circle me-3"
                   size="sm"
-                  color={feed.color}
+                  color="primary"
                 >
-                  <i className={feed.icon}></i>
+                  <i className="bi bi-bell"></i>
                 </Button>
-                {feed.title}
+                {notification.data.message}
                 <small className="ms-auto text-muted text-small">
-                  {feed.date}
+                  {new Date(notification.created_at).toLocaleString()}
                 </small>
               </ListGroupItem>
             ))}
