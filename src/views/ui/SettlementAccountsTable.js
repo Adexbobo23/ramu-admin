@@ -45,18 +45,13 @@ const SettlementAccountsTable = () => {
     setModal(!modal);
   };
 
-  const viewDetails = (account) => {
-    setSelectedAccount(account);
-    toggleModal();
-  };
-
   const handleEdit = (account) => {
     setSelectedAccount(account);
     setEditedAccount({ ...account });
     toggleModal();
   };
 
-  const handleSave = () => {
+  const handleApprove = () => {
     const adminAuthToken = localStorage.getItem("adminAuthToken");
     if (!adminAuthToken) {
       console.error("Admin authentication token not found in local storage.");
@@ -68,17 +63,17 @@ const SettlementAccountsTable = () => {
       },
     })
       .then(response => {
-        console.log("Edit successful:", response.data);
-        setSuccessMessage("Account edited successfully!");
-        window.alert("Account edited successfully!");
+        console.log("Approval successful:", response.data);
+        setSuccessMessage("Account approved successfully!");
+        window.alert("Account approved successfully!");
       })
       .catch(error => {
-        console.error("Error editing account:", error);
+        console.error("Error approving account:", error);
       });
     toggleModal();
   };
 
-  const handleDelete = (accountId) => {
+  const handleDeny = (accountId) => {
     const adminAuthToken = localStorage.getItem("adminAuthToken");
     if (!adminAuthToken) {
       console.error("Admin authentication token not found in local storage.");
@@ -90,13 +85,12 @@ const SettlementAccountsTable = () => {
       },
     })
       .then(response => {
-        console.log("Delete successful:", response.data);
-        setSuccessMessage("Account deleted successfully!");
-        // Handle local state update or refetch settlement accounts
-        window.alert("Account deleted successfully!");
+        console.log("Denial successful:", response.data);
+        setSuccessMessage("Account denied successfully!");
+        window.alert("Account denied successfully!");
       })
       .catch(error => {
-        console.error("Error deleting account:", error);
+        console.error("Error denying account:", error);
       });
   };
 
@@ -128,6 +122,7 @@ const SettlementAccountsTable = () => {
       <Table striped className="settlement-accounts-table">
         <thead>
           <tr>
+            <th>Name</th>
             <th>Email</th>
             <th>Bank Code</th>
             <th>Bank Name</th>
@@ -138,7 +133,8 @@ const SettlementAccountsTable = () => {
         </thead>
         <tbody>
           {currentAccounts.map((account) => (
-            <tr key={account.id}>
+              <tr key={account.id}>
+                <td></td>
               <td>{account.user.email}</td>
               <td>{account.bank_code}</td>
               <td>{account.beneficiary_bank_name}</td>
@@ -148,11 +144,11 @@ const SettlementAccountsTable = () => {
                 <Button color="info" onClick={() => handleEdit(account)}>
                   Edit
                 </Button>{" "}
-                <Button color="success" onClick={() => viewDetails(account)}>
-                  View
+                <Button color="success" onClick={() => handleApprove(account.id)}>
+                  Approve
                 </Button>{" "}
-                <Button color="danger" onClick={() => handleDelete(account.id)}>
-                  Delete
+                <Button color="danger" onClick={() => handleDeny(account.id)}>
+                  Deny
                 </Button>
               </td>
             </tr>
@@ -197,7 +193,7 @@ const SettlementAccountsTable = () => {
           </FormGroup>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={handleSave}>
+          <Button color="primary" onClick={handleApprove}>
             Save
           </Button>{" "}
           <Button color="secondary" onClick={toggleModal}>

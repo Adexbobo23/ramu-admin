@@ -383,6 +383,19 @@ const Sidebar = () => {
                   <span className="ms-3 d-inline-block">Stock List</span>
                 </Link>
               </NavItem>
+              <NavItem className="sidenav-bg">
+                <Link
+                  to="/popular-stock"
+                  className={
+                    location.pathname === "/popular-stock"
+                      ? "active nav-link py-3"
+                      : "nav-link py-3"
+                  }
+                >
+                  {/* <i className="bi bi-patch-check"></i> */}
+                  <span className="ms-3 d-inline-block">Popular This Week Stocks</span>
+                </Link>
+              </NavItem>
               <NavItem>
                   <Link
                     to="/add-sectors"
@@ -430,6 +443,18 @@ const Sidebar = () => {
                     }
                   >
                     <span className="ms-3 d-inline-block">Add Stock</span>
+                  </Link>
+                </NavItem>
+                <NavItem>
+                  <Link
+                    to="/add-popular-stock"
+                    className={
+                      location.pathname === "/add-popular-stock"
+                        ? "active nav-link py-2"
+                        : "nav-link py-2"
+                    }
+                  >
+                    <span className="ms-3 d-inline-block">Add Popular Stock</span>
                   </Link>
                 </NavItem>
               </Nav>

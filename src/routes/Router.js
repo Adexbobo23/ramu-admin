@@ -45,6 +45,8 @@ import TransactionPin from "../views/ui/TransactionPin.js";
 import AddSectorForm from "../views/ui/AddSectorForm.js";
 import GTNStock from "../views/ui/GTNStock.js";
 import ExchangeRate from "../views/ui/ExchangeRate.js";
+import PopularThisWeek from "../views/ui/PopularThisWeek.js";
+import AddPopular from "../views/ui/AddPopularStock.js";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
@@ -116,6 +118,8 @@ const ThemeRoutes = [
       { path: "/add-sectors", exact: true, element: <AddSectorForm /> },
       { path: "/all-gtnstocks", exact: true, element: <GTNStock /> },
       { path: "/exchange-rate", exact: true, element: <ExchangeRate /> },
+      { path: "/popular-stock", exact: true, element: <PopularThisWeek /> },
+      { path: "/add-popular-stock", exact: true, element: <AddPopular /> },
     ],
   },
 ];

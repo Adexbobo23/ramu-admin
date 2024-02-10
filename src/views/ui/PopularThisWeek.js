@@ -3,7 +3,7 @@ import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
 import "../ComStyle/StockListing.scss";
 
-const StockListing = () => {
+const PopularThisWeek = () => {
   const [stockListings, setStockListings] = useState([]);
   const [selectedStock, setSelectedStock] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -199,7 +199,7 @@ const StockListing = () => {
 
   return (
     <div className="wallet-management">
-      <h1>Stock Listings</h1>
+      <h1>Popular Stock Listings</h1>
       <div className="search-container">
         <input
           type="text"
@@ -345,4 +345,4 @@ const StockListing = () => {
   );
 };
 
-export default StockListing;
+export default PopularThisWeek;

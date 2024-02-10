@@ -51,7 +51,7 @@ const ExchangeRate = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post(
+      const response = await axios.put(
         `https://api-staging.ramufinance.com/api/v1/edit-exchange-rate/${selectedRate.id}`,
         {
           ngn_usd: parseFloat(ngnToUsd),

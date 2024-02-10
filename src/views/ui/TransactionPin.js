@@ -72,7 +72,7 @@ const TransactionPin = () => {
         transaction_pin_confirmation: confirmTransactionPin,
       };
   
-      const response = await axios.post(
+      const response = await axios.put(
         'https://api-staging.ramufinance.com/api/v1/admin/reset-transaction-pin',
         resetPinPayload,
         {
@@ -138,6 +138,7 @@ const TransactionPin = () => {
             value={newTransactionPin}
             onChange={(e) => setNewTransactionPin(e.target.value)}
             required
+            maxLength={4}
           />
         </FormGroup>
         <FormGroup>
@@ -149,6 +150,7 @@ const TransactionPin = () => {
             value={confirmTransactionPin}
             onChange={(e) => setConfirmTransactionPin(e.target.value)}
             required
+            maxLength={4}
           />
         </FormGroup>
         <Button color="primary" onClick={handleResetPin}>
