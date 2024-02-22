@@ -5,6 +5,8 @@ import "../ComStyle/AddStock.scss";
 const AddStock = () => {
   const [exchangeCode, setExchangeCode] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [keyValue, setKeyValue] = useState("");
+  const [tickerId, setTickerId] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState("");
   const [sectorOptions, setSectorOptions] = useState([]);
@@ -54,8 +56,8 @@ const AddStock = () => {
       }
 
       const formData = new FormData();
-      formData.append("key", `${exchangeCode}~${companyName}`);
-      formData.append("ticker_id", companyName);
+      formData.append("key", keyValue); 
+      formData.append("ticker_id", tickerId);
       formData.append("exchange_code", exchangeCode);
       formData.append("company_name", companyName);
       formData.append("display_name", displayName);
@@ -77,10 +79,10 @@ const AddStock = () => {
       if (response.status >= 200 && response.status < 300) {
         console.log("Stock added successfully");
         alert('Stock Added Successfully')
-        // Optionally, you can handle success scenarios here
-        // Reset the form fields after adding the stock
         setExchangeCode("");
         setCompanyName("");
+        setKeyValue("");
+        setTickerId("");
         setDisplayName("");
         setDescription("");
         setSelectedSector("");
@@ -104,6 +106,24 @@ const AddStock = () => {
     <div className="add-stock">
       <h2>Add New Stock</h2>
       <form>
+      <div className="form-group">
+          <label htmlFor="key">Key</label>
+          <input
+            type="text"
+            id="key"
+            value={keyValue}
+            onChange={(e) => setKeyValue(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="tickerId">Ticker ID</label>
+          <input
+            type="text"
+            id="tickerId"
+            value={tickerId}
+            onChange={(e) => setTickerId(e.target.value)}
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="exchangeCode">Exchange Code</label>
           <input
@@ -121,7 +141,7 @@ const AddStock = () => {
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
           />
-        </div>
+        </div>       
         <div className="form-group">
           <label htmlFor="displayName">Display Name</label>
           <input

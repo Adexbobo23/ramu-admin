@@ -65,7 +65,7 @@ const PopularThisWeek = () => {
     if (adminAuthToken) {
       // Fetch stock listings from the backend API using the admin token for authentication
       axios
-        .get("https://api-staging.ramufinance.com/api/v1/admin/stocks/get-stock-companies", {
+        .get('https://api-staging.ramufinance.com/api/v1/top-trending-stocks', {
           headers: {
             Authorization: `Bearer ${adminAuthToken}`,
             "Content-Type": "application/json",

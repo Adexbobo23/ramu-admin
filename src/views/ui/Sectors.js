@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from "reactstrap";
 import "../ComStyle/Sectors.scss";
 
 // Add formatDate function here
@@ -186,7 +186,7 @@ const Sectors = () => {
           {selectedSector && (
             <>
               <label htmlFor="editName">Name:</label>
-              <input
+              <Input
                 type="text"
                 id="editName"
                 value={selectedSector.name}
@@ -198,7 +198,8 @@ const Sectors = () => {
                 }
               />
               <label htmlFor="editDescription">Description:</label>
-              <textarea
+              <Input
+                type="textarea"
                 id="editDescription"
                 value={selectedSector.description || ""}
                 onChange={(e) =>
@@ -207,7 +208,7 @@ const Sectors = () => {
                     description: e.target.value,
                   })
                 }
-              ></textarea>
+              />
               <label htmlFor="editLogo">Logo:</label>
               <input
                 type="file"

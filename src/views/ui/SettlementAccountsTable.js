@@ -20,24 +20,25 @@ const SettlementAccountsTable = () => {
   });
   const [successMessage, setSuccessMessage] = useState(null);
 
-  useEffect(() => {
-    const fetchSettlementAccounts = async () => {
-      try {
-        const adminAuthToken = localStorage.getItem("adminAuthToken");
-        if (!adminAuthToken) {
-          console.error("Admin authentication token not found in local storage.");
-          return;
-        }
-        const response = await axios.get("https://api-staging.ramufinance.com/api/v1/admin/settlement-accounts", {
-          headers: {
-            Authorization: `Bearer ${adminAuthToken}`,
-          },
-        });
-        setSettlementAccounts(response.data.data);
-      } catch (error) {
-        console.error("Error fetching settlement accounts:", error);
+  const fetchSettlementAccounts = async () => {
+    try {
+      const adminAuthToken = localStorage.getItem("adminAuthToken");
+      if (!adminAuthToken) {
+        console.error("Admin authentication token not found in local storage.");
+        return;
       }
-    };
+      const response = await axios.get("https://api-staging.ramufinance.com/api/v1/admin/settlement-accounts", {
+        headers: {
+          Authorization: `Bearer ${adminAuthToken}`,
+        },
+      });
+      setSettlementAccounts(response.data.data);
+    } catch (error) {
+      console.error("Error fetching settlement accounts:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchSettlementAccounts();
   }, []);
 
@@ -52,12 +53,17 @@ const SettlementAccountsTable = () => {
   };
 
   const handleApprove = () => {
+    if (!selectedAccount) {
+      console.error("No account selected.");
+      return;
+    }
+  
     const adminAuthToken = localStorage.getItem("adminAuthToken");
     if (!adminAuthToken) {
       console.error("Admin authentication token not found in local storage.");
       return;
     }
-    axios.put(`https://api-staging.ramufinance.com/api/v1/admin/edit-settlement-account/${selectedAccount.id}`, editedAccount, {
+    axios.put(`https://api-staging.ramufinance.com/api/v1/admin/approve-settlement-account/${selectedAccount.id}`, null, {
       headers: {
         Authorization: `Bearer ${adminAuthToken}`,
       },
@@ -66,12 +72,14 @@ const SettlementAccountsTable = () => {
         console.log("Approval successful:", response.data);
         setSuccessMessage("Account approved successfully!");
         window.alert("Account approved successfully!");
+        fetchSettlementAccounts();
       })
       .catch(error => {
         console.error("Error approving account:", error);
       });
-    toggleModal();
   };
+  
+  
 
   const handleDeny = (accountId) => {
     const adminAuthToken = localStorage.getItem("adminAuthToken");
@@ -88,6 +96,7 @@ const SettlementAccountsTable = () => {
         console.log("Denial successful:", response.data);
         setSuccessMessage("Account denied successfully!");
         window.alert("Account denied successfully!");
+        fetchSettlementAccounts();
       })
       .catch(error => {
         console.error("Error denying account:", error);
@@ -100,6 +109,30 @@ const SettlementAccountsTable = () => {
       ...editedAccount,
       [name]: value,
     });
+  };
+
+  const handleSave = () => {
+    const adminAuthToken = localStorage.getItem("adminAuthToken");
+    if (!adminAuthToken) {
+      console.error("Admin authentication token not found in local storage.");
+      return;
+    }
+
+    axios.put(`https://api-staging.ramufinance.com/api/v1/admin/edit-settlement-account/${selectedAccount.id}`, editedAccount, {
+      headers: {
+        Authorization: `Bearer ${adminAuthToken}`,
+      },
+    })
+      .then(response => {
+        console.log("Edit successful:", response.data);
+        setSuccessMessage("Account edited successfully!");
+        window.alert("Account edited successfully!");
+        fetchSettlementAccounts();
+        toggleModal();
+      })
+      .catch(error => {
+        console.error("Error editing account:", error);
+      });
   };
 
   const totalPages = Math.ceil(settlementAccounts.length / accountsPerPage);
@@ -132,28 +165,28 @@ const SettlementAccountsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {currentAccounts.map((account) => (
-              <tr key={account.id}>
-                <td></td>
-              <td>{account.user.email}</td>
-              <td>{account.bank_code}</td>
-              <td>{account.beneficiary_bank_name}</td>
-              <td>{account.account_number}</td>
-              <td>{account.beneficiary_account_name}</td>
-              <td>
-                <Button color="info" onClick={() => handleEdit(account)}>
-                  Edit
-                </Button>{" "}
-                <Button color="success" onClick={() => handleApprove(account.id)}>
-                  Approve
-                </Button>{" "}
-                <Button color="danger" onClick={() => handleDeny(account.id)}>
-                  Deny
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        {currentAccounts.map((account) => (
+          <tr key={account.id}>
+            <td>{`${account.user?.first_name || ''} ${account.user?.last_name || ''}`}</td>
+            <td>{account.email}</td>
+            <td>{account.bank_code}</td>
+            <td>{account.beneficiary_bank_name}</td>
+            <td>{account.account_number}</td>
+            <td>{account.beneficiary_account_name}</td>
+            <td className="btn">
+              <Button color="info" onClick={() => handleEdit(account)}>
+                Edit
+              </Button>{" "}
+              <Button color="success" onClick={() => handleApprove(account.id)}>
+                Approve
+              </Button>{" "}
+              <Button color="danger" onClick={() => handleDeny(account.id)}>
+                Deny
+              </Button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
       </Table>
 
       <nav>
@@ -173,27 +206,27 @@ const SettlementAccountsTable = () => {
         <ModalBody>
           <FormGroup>
             <Label for="email">Email</Label>
-            <Input type="text" name="email" id="email" value={editedAccount.user?.email || ''} />
+            <Input type="text" name="email" id="email" value={editedAccount.user?.email || ''} readOnly />
           </FormGroup>
           <FormGroup>
             <Label for="bankCode">Bank Code</Label>
-            <Input type="text" name="bankCode" id="bankCode" value={editedAccount.bank_code || ''} onChange={handleInputChange} />
+            <Input type="text" name="bank_code" id="bankCode" value={editedAccount.bank_code || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
             <Label for="bankName">Bank Name</Label>
-            <Input type="text" name="bankName" id="bankName" value={editedAccount.beneficiary_bank_name || ''} onChange={handleInputChange} />
+            <Input type="text" name="beneficiary_bank_name" id="bankName" value={editedAccount.beneficiary_bank_name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
             <Label for="accountNumber">Account Number</Label>
-            <Input type="text" name="accountNumber" id="accountNumber" value={editedAccount.account_number || ''} onChange={handleInputChange} />
+            <Input type="text" name="account_number" id="accountNumber" value={editedAccount.account_number || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
             <Label for="accountName">Account Name</Label>
-            <Input type="text" name="accountName" id="accountName" value={editedAccount.beneficiary_account_name || ''} onChange={handleInputChange} />
+            <Input type="text" name="beneficiary_account_name" id="accountName" value={editedAccount.beneficiary_account_name || ''} onChange={handleInputChange} />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={handleApprove}>
+          <Button color="primary" onClick={handleSave}>
             Save
           </Button>{" "}
           <Button color="secondary" onClick={toggleModal}>
