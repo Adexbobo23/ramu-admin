@@ -385,15 +385,15 @@ const Sidebar = () => {
               </NavItem>
               <NavItem className="sidenav-bg">
                 <Link
-                  to="/popular-stock"
+                  to="/feature-stock"
                   className={
-                    location.pathname === "/popular-stock"
+                    location.pathname === "/feature-stock"
                       ? "active nav-link py-3"
                       : "nav-link py-3"
                   }
                 >
                   {/* <i className="bi bi-patch-check"></i> */}
-                  <span className="ms-3 d-inline-block">Popular This Week Stocks</span>
+                  <span className="ms-3 d-inline-block">Feature Stocks</span>
                 </Link>
               </NavItem>
               <NavItem>
@@ -447,14 +447,14 @@ const Sidebar = () => {
                 </NavItem>
                 <NavItem>
                   <Link
-                    to="/add-popular-stock"
+                    to="/add-feature-stock"
                     className={
-                      location.pathname === "/add-popular-stock"
+                      location.pathname === "/add-feature-stock"
                         ? "active nav-link py-2"
                         : "nav-link py-2"
                     }
                   >
-                    <span className="ms-3 d-inline-block">Add Popular Stock</span>
+                    <span className="ms-3 d-inline-block">Add Feature Stock</span>
                   </Link>
                 </NavItem>
               </Nav>
