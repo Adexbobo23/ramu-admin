@@ -89,6 +89,7 @@ const GTNStock = () => {
             <tr>
               <th>Ticker ID</th>
               <th>Source ID</th>
+              <th>KEY</th>
               <th>Short Description</th>
               <th>Long Description</th>
               <th>Market ID</th>
@@ -100,6 +101,7 @@ const GTNStock = () => {
               <tr key={stock.TICKER_ID}>
                 <td>{stock.TICKER_ID}</td>
                 <td>{stock.SOURCE_ID}</td>
+                <td>{stock.SOURCE_ID}~{stock.TICKER_ID}</td>
                 <td>{stock.SHORT_DESCRIPTION}</td>
                 <td>{stock.LONG_DESCRIPTION}</td>
                 <td>{stock.MARKET_ID}</td>
