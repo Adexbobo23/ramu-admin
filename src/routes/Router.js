@@ -47,6 +47,8 @@ import GTNStock from "../views/ui/GTNStock.js";
 import ExchangeRate from "../views/ui/ExchangeRate.js";
 import AddFeatureStock from "../views/ui/AddFeatureStock.js";
 import FeatureStocks from "../views/ui/FeatureStocks.js";
+import PopularStocks from "../views/ui/PopularThisWeek.js";
+import AddPopularStock from "../views/ui/AddPopular.js";
 
 /****Layouts*****/
 const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
@@ -120,6 +122,8 @@ const ThemeRoutes = [
       { path: "/exchange-rate", exact: true, element: <ExchangeRate /> },
       { path: "/feature-stock", exact: true, element: <FeatureStocks /> },
       { path: "/add-feature-stock", exact: true, element: <AddFeatureStock /> },
+      { path: "/popular-stocks", exact: true, element: <PopularStocks /> },
+      { path: "/add-popular-stocks", exact: true, element: <AddPopularStock /> },
     ],
   },
 ];
